@@ -1,0 +1,34 @@
+/* General styling */
+body {
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* App container */
+  .App {
+    text-align: center;
+    padding-top: 2rem;
+  }
+  
+  /* Note input area */
+  .note-input-area {
+    margin-bottom: 2rem;
+  }
+  
+  .note-input {
+    color: rgb(82, 156, 12);
+    margin-bottom: 1rem;
+  }
+  
+  /* Note grid */
+  .note-grid {
+    padding: 1rem;
+  }
+  
+  .note-grid-item {
+    padding: 8px;
+  }
+  
