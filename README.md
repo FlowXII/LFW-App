@@ -1,2 +1,2 @@
-# Smash-Helper
-Note-Keeping for SSBU
+# LFW-APP
+Learn, Fight, Win.
