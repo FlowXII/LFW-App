@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { Container, ThemeProvider, CssBaseline, Button } from '@mui/material';
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import { Container, ThemeProvider, CssBaseline} from '@mui/material';
 import { darkTheme, lightTheme } from './theme';
 import NoteForm from './NoteForm';
-import NoteList from './NoteList';
+import HomePage from './HomePage';
 import LFWAuth from './LFWAuth';
+import MyNotes from "./MyNotes";
 import ThemeToggle from './ThemeToggle';
 import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import LFWLogout from './LFWLogout';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -46,6 +46,8 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+
+
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
@@ -53,30 +55,10 @@ function App() {
         <Router>
           <ThemeToggle isDark={darkMode} handleThemeChange={handleThemeChange} />
           <Routes>
-            <Route exact path="/" element={
-              <div>
-                <h1>Main Page</h1>
-                <NoteForm addNote={addNote} />
-                <NoteList notes={notes} />
-                {/* Conditional rendering based on user authentication state */}
-                {user ? (
-                  // If user is logged in, display a personalized welcome message and a logout button
-                  <div>
-                    <p>Welcome, {user.displayName ? user.displayName : "Guest"}!</p>
-                    <LFWLogout setUser={setUser} />
-                  </div>
-                ) : (
-                  // If user is not logged in, display a generic welcome message and a link to the login page
-                  <div>
-                    <p>Welcome, Guest!</p>
-                    <Link to="/login">Go to Login Page</Link>
-                  </div>
-                )}
-              </div>
-            } />
-            {/* Route for the login page */}
+            <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
+            <Route path="/createnote" element={<NoteForm user={user} addNote={addNote} />} />
             <Route path="/login" element={<LFWAuth setUser={setUser} />} />
-            {/* Add other protected routes */}
+            <Route path="/mynotes" element={<MyNotes/>} />
           </Routes>
         </Router>
       </Container>

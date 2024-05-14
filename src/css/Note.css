@@ -31,4 +31,8 @@ body {
   .note-grid-item {
     padding: 8px;
   }
+
+.expandableTextArea {
+  height: auto !important;
+}
   

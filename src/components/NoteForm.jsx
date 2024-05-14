@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Paper, TextField, Button } from '@mui/material';
 import { collection, addDoc, getFirestore } from "firebase/firestore"
+import { setDoc, doc } from "firebase/firestore";
+
 
 // Composant pour créer une nouvelle note
-function NoteForm({ addNote, firestore }) {
+function NoteForm({ addNote, firestore, user }) {
   // État pour stocker le titre de la note
   const [title, setTitle] = useState('');
 
@@ -19,33 +21,34 @@ function NoteForm({ addNote, firestore }) {
   // État pour contrôler l'affichage des champs optionnels
   const [showExtras, setShowExtras] = useState(false);
 
+  // Extract the `displayName` property out of `user`
+  const username = user ? user.displayName : 'Anonymous';
+
   // Fonction pour ajouter les notes à la collection
-  async function add_note_to_collection(notesCollection, newNoteData) {
-    try {
-      const docRef = await addDoc(notesCollection, newNoteData);
-      console.log("Document written with ID: ", docRef.id);
-    } catch (error) {
-      console.error("Error adding document: ", error);
-    }
-  }
-  
-  
   const handleSubmit = async () => {
-    if (newNote && title) {
+    if (newNote && title && user) {
       try {
         // Add note to external function (assuming addNote handles logic)
         addNote({ title, text: newNote, image: newImage, link: newLink });
   
         const firestore = await getFirestore(); // Wait for firestore instance
-        const notesRef = collection(firestore, "notes");
-        const newNoteData = {  // Create an object with user input
+
+        // ID de la date actuelle en string
+        const id = Date.now().toString();
+
+        const newNoteData = {
+          id: id,
           note_title: title,
           note_text: newNote,
-          // Add optional fields if applicable
-          // image: newImage,
-          // link: newLink,
+          image: newImage,
+          link: newLink,
+          username : username
         };
-        await add_note_to_collection(notesRef, newNoteData);
+
+        // Using Firestore's `setDoc` function to write the document with `title` as the ID.
+        const noteRef = doc(firestore, "notes", id);
+        await setDoc(noteRef, newNoteData);
+
         console.log('Note added successfully!');
       } catch (error) {
         console.error("Error adding note:", error);
@@ -74,11 +77,13 @@ function NoteForm({ addNote, firestore }) {
 
       {/* Champ de saisie pour le contenu de la note */}
       <TextField
-        label="Contenu de la note"
+        label="Note Content"
         value={newNote}
         onChange={(e) => setNewNote(e.target.value)}
         fullWidth
         style={{ margin: '1rem 0' }}
+        multiline  // Allow for multiple lines of input
+        rows={20}
       />
 
       {/* Bouton pour afficher/masquer les champs optionnels */}

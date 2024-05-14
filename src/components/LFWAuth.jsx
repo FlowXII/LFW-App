@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { Button } from '@mui/material';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import LFWLogout from './LFWLogout';
 
-const LFWAuth = ({ user, setUser }) => { // Add setUser as a prop
+const LFWAuth = ({ user, setUser }) => {
   const auth = getAuth(); // Initialize auth here
 
   const handleSignInWithGoogle = async () => {
@@ -20,15 +19,14 @@ const LFWAuth = ({ user, setUser }) => { // Add setUser as a prop
   return (
     <div>
       <h1>Login Page</h1>
-      <Button variant="contained" onClick={handleSignInWithGoogle}>Sign In With Google</Button>
-      {/* Conditional rendering based on user authentication state */}
-      {user && (
+
+      {user ? (
         <p>Welcome, {user.displayName}!</p>
+      ) : (
+        <Button variant="contained" onClick={handleSignInWithGoogle}>Sign In With Google</Button>
       )}
+
       <LFWLogout setUser={setUser} />
-     <Link to="/">
-        <Button variant='contained'>Go to Home</Button>
-    </Link>
     </div>
   );
 };
