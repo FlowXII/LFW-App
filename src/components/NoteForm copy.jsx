@@ -20,15 +20,19 @@ function NoteForm({ addNote, firestore }) {
   const [showExtras, setShowExtras] = useState(false);
 
   // Fonction pour ajouter les notes à la collection
-  async function add_note_to_collection(notesCollection, newNoteData) {
+  async function add_note_to_collection(notesCollection,firestore) {
+    console.log(notesCollection)
     try {
-      const docRef = await addDoc(notesCollection, newNoteData);
+      const notesRef = collection(firestore, notesCollection); // Use firestore instance to create the reference
+      const docRef = await addDoc(collection(notesCollection, "note_content"), {
+        note_title: "Writing Firestore",
+        note_text: "This is an in-depth test on writing into the collection",
+      });
       console.log("Document written with ID: ", docRef.id);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
   }
-  
   
   const handleSubmit = async () => {
     if (newNote && title) {
@@ -45,7 +49,7 @@ function NoteForm({ addNote, firestore }) {
           // image: newImage,
           // link: newLink,
         };
-        await add_note_to_collection(notesRef, newNoteData);
+        await add_note_to_collection(notesRef, firestore, newNoteData);
         console.log('Note added successfully!');
       } catch (error) {
         console.error("Error adding note:", error);

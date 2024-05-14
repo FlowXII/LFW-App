@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
-import { Container, ThemeProvider, CssBaseline } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { Container, ThemeProvider, CssBaseline, Button } from '@mui/material';
 import { darkTheme, lightTheme } from './theme';
 import NoteForm from './NoteForm';
 import NoteList from './NoteList';
+import LFWAuth from './LFWAuth';
 import ThemeToggle from './ThemeToggle';
-// Required for side-effects
-import "firebase/firestore";
-// Import the functions you need from the SDKs you need
+import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import LFWLogout from './LFWLogout';
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBcBjTVVSeTX0ayCDHch-y_S8pa8eUqf3E",
   authDomain: "smash-helper.firebaseapp.com",
@@ -27,13 +23,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
+const auth = getAuth(app);
 
 function App() {
   const [notes, setNotes] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
-  console.log("Current theme: ", darkMode ? darkTheme : lightTheme);
+  const [user, setUser] = useState(null);
+
+  // Check user authentication state on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const addNote = (noteData) => {
     setNotes([...notes, noteData]);
   };
@@ -44,17 +48,40 @@ function App() {
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <CssBaseline /> {/* Ensures background color and other basics are applied */}
+      <CssBaseline />
       <Container>
-        <ThemeToggle isDark={darkMode} handleThemeChange={handleThemeChange} />
-        <NoteForm addNote={addNote} />
-        <NoteList notes={notes} />
+        <Router>
+          <ThemeToggle isDark={darkMode} handleThemeChange={handleThemeChange} />
+          <Routes>
+            <Route exact path="/" element={
+              <div>
+                <h1>Main Page</h1>
+                <NoteForm addNote={addNote} />
+                <NoteList notes={notes} />
+                {/* Conditional rendering based on user authentication state */}
+                {user ? (
+                  // If user is logged in, display a personalized welcome message and a logout button
+                  <div>
+                    <p>Welcome, {user.displayName ? user.displayName : "Guest"}!</p>
+                    <LFWLogout setUser={setUser} />
+                  </div>
+                ) : (
+                  // If user is not logged in, display a generic welcome message and a link to the login page
+                  <div>
+                    <p>Welcome, Guest!</p>
+                    <Link to="/login">Go to Login Page</Link>
+                  </div>
+                )}
+              </div>
+            } />
+            {/* Route for the login page */}
+            <Route path="/login" element={<LFWAuth setUser={setUser} />} />
+            {/* Add other protected routes */}
+          </Routes>
+        </Router>
       </Container>
     </ThemeProvider>
   );
 }
 
 export default App;
-
-
-
