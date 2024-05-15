@@ -60,8 +60,8 @@ const GET_DATA = gql`
 
 function TOLoader() {
     // Replace eventId and stationNumbers with your actual values
-    const eventId = '1140299';
-    const stationNumbers = [1, 2, 3, 4, 5, 6]; // your actual station numbers
+    const eventId = '1127277';
+    const stationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]; // your actual station numbers
 
     const { loading, error, data } = useQuery(GET_DATA, {
         variables: { eventId, stationNumbers },

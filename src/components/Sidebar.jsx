@@ -18,6 +18,10 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
         navigate('/toloader');
     };
 
+    const handleLogin = () => {
+        navigate('/login');
+    }
+
     return (
         <Drawer
             variant="permanent"
@@ -47,6 +51,9 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 </ListItem>
                     <ListItem button onClick={handleTOloader}>
                         <ListItemText primary='TO Loader' />
+                </ListItem>
+                <ListItem button onClick={handleLogin}>
+                        <ListItemText primary='Login' />
                 </ListItem>
             </List>
         </Drawer>
