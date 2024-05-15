@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, Typography, Button } from '@mui/material';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 function MyNotes() {
     const [notes, setNotes] = useState([]);
@@ -20,29 +21,26 @@ function MyNotes() {
         fetchNotes();
     }, []);
 
-    // Adding a stub for handleEditButtonClick - to be implemented
-    const handleEditButtonClick = (noteId) => {
-        console.log(`Edit button clicked for note: ${noteId}`);
+    const navigate = useNavigate();
+    const handleEditButtonClick = (noteId) =>{
+        navigate(`/editnote/${noteId}`);
+    };
+
+    const handleNewButtonClick = () => {
+        navigate('/createnote');
     };
 
     return (
         <div>
+            <Typography variant="h2" gutterBottom>
+                Your Notes
+            </Typography>
+            <Button variant="contained" color="primary" onClick={handleNewButtonClick}> Create a New Note </Button>
             {notes.map((note, index) => (
                 <Card key={index} style={{ margin: '1rem' }}>
                     <CardHeader title={note.note_title} />
-                        <CardContent>
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                {note.note_text}
-                            </Typography>
-                            {note.image && (
-                                <img src={note.image} alt={note.note_title} style={{ width: '100%', height: 'auto' }} />
-                            )}
-                            {note.link && (
-                                <Typography variant="body2" color="textSecondary" component="p">
-                                    Link: <a href={note.link}>{note.link}</a>
-                                </Typography>
-                            )}
-                        <Button color='primary' onClick={() => handleEditButtonClick(note.id)}>Edit</Button>
+                    <CardContent>
+                        <Button variant="contained" color='primary' onClick={() => handleEditButtonClick(note.id)}>Check and Edit</Button>
                     </CardContent>          
                 </Card>
             ))}

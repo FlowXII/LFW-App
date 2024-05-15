@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import { Container, ThemeProvider, CssBaseline} from '@mui/material';
+import { Box } from '@mui/system';
 import { darkTheme, lightTheme } from './theme';
 import NoteForm from './NoteForm';
 import HomePage from './HomePage';
 import LFWAuth from './LFWAuth';
 import MyNotes from "./MyNotes";
+import EditNote from "./EditNote"
+import Sidebar from "./Sidebar"
+import TOloader from "./TOloader.jsx"
 import ThemeToggle from './ThemeToggle';
 import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
@@ -51,17 +55,21 @@ function App() {
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
-      <Container>
+      <Box sx={{ display: 'flex' }}>
         <Router>
-          <ThemeToggle isDark={darkMode} handleThemeChange={handleThemeChange} />
-          <Routes>
-            <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
-            <Route path="/createnote" element={<NoteForm user={user} addNote={addNote} />} />
-            <Route path="/login" element={<LFWAuth setUser={setUser} />} />
-            <Route path="/mynotes" element={<MyNotes/>} />
-          </Routes>
+          <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
+          <Box sx={{flexGrow: 1}}> {/* Add the Box component here */}
+            <Routes>
+              <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
+              <Route path="/createnote" element={<NoteForm user={user} addNote={addNote} />} />
+              <Route path="/login" element={<LFWAuth setUser={setUser} />} />
+              <Route path="/mynotes" element={<MyNotes/>} />
+              <Route path="/editnote/:id" element={<EditNote/>} />
+              <Route path="/toloader" element={<TOloader/>} />
+            </Routes>
+          </Box>
         </Router>
-      </Container>
+      </Box>
     </ThemeProvider>
   );
 }
