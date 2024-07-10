@@ -18,6 +18,10 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
         navigate('/toloader');
     };
 
+    const handleNextBattle = () => {
+        navigate('/nextbattle');
+    };
+
     const handleLogin = () => {
         navigate('/login');
     }
@@ -54,6 +58,9 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 </ListItem>
                 <ListItem button onClick={handleLogin}>
                         <ListItemText primary='Login' />
+                </ListItem>
+                <ListItem button onClick={handleNextBattle}>
+                        <ListItemText primary='Next Battle' />
                 </ListItem>
             </List>
         </Drawer>

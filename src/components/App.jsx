@@ -9,7 +9,10 @@ import LFWAuth from './LFWAuth';
 import MyNotes from "./MyNotes";
 import EditNote from "./EditNote"
 import Sidebar from "./Sidebar"
+import NextBattle from "./NextBattle"
 import TOloader from "./TOloader.jsx"
+import { ApolloProvider } from '@apollo/client'; // Import ApolloProvider
+import client from './ApolloClientProvider'; // Import the Apollo Client instance
 import ThemeToggle from './ThemeToggle';
 import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
@@ -50,27 +53,28 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-
-
   return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        <Router>
-          <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
-          <Box sx={{flexGrow: 1}}> {/* Add the Box component here */}
-            <Routes>
-              <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
-              <Route path="/createnote" element={<NoteForm user={user} addNote={addNote} />} />
-              <Route path="/login" element={<LFWAuth setUser={setUser} />} />
-              <Route path="/mynotes" element={<MyNotes/>} />
-              <Route path="/editnote/:id" element={<EditNote/>} />
-              <Route path="/toloader" element={<TOloader/>} />
-            </Routes>
-          </Box>
-        </Router>
-      </Box>
-    </ThemeProvider>
+    <ApolloProvider client={client}> {/* Wrap the root component with ApolloProvider */}
+      <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+        <CssBaseline />
+        <Box sx={{ display: 'flex' }}>
+          <Router>
+            <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
+            <Box sx={{flexGrow: 1}}> {/* Add the Box component here */}
+              <Routes>
+                <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
+                <Route path="/createnote" element={<NoteForm user={user} addNote={addNote} />} />
+                <Route path="/login" element={<LFWAuth setUser={setUser} />} />
+                <Route path="/mynotes" element={<MyNotes/>} />
+                <Route path="/editnote/:id" element={<EditNote/>} />
+                <Route path="/toloader" element={<TOloader/>} />
+                <Route path="/nextbattle" element={<NextBattle/>} />
+              </Routes>
+            </Box>
+          </Router>
+        </Box>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
 
