@@ -1,34 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ApolloClient, InMemoryCache, ApolloProvider, useQuery, gql, createHttpLink } from "@apollo/client";
-import { setContext } from '@apollo/client/link/context';
+import { useQuery, gql } from '@apollo/client'; // Import necessary Apollo Client components
+import { ApolloProvider } from '@apollo/client'; // Import ApolloProvider
+import client from './ApolloClientProvider'; // Import the Apollo Client instance
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 
-// HTTP connection to the API
-const httpLink = createHttpLink({
-    uri: 'https://api.start.gg/gql/alpha', // replace with your GraphQL API endpoint
-});
+function TOLoader() {
 
-// Create the authorization header
-const authLink = setContext((_, { headers }) => {
-    const token = "cd984c5069a9935bfb3d13d6a4f859c5"; //or replace with your auth token
-    return {
-        headers: {
-            ...headers,
-            Authorization: token ? `Bearer ${token}` : "",
-        }
-    }
-});
-
-// Initialising Apollo Client
-const client = new ApolloClient({
-    link: authLink.concat(httpLink),
-    cache: new InMemoryCache()
-});
-
-// Your provided GraphQL query
-const GET_DATA = gql`
-    # Query to fetch sets at a specific station for a given event
-    query SetsAtStation($eventId: ID!, $stationNumbers: [Int]) {
+    // Sets at station query
+    const GET_DATA = gql`
+    query SetsAtStation($eventId: ID!, $stationNumbers: [Int]){
         event(id: $eventId) {
             id
             name
@@ -57,11 +37,9 @@ const GET_DATA = gql`
             }
         }
     }
-`;
+    `;
 
 const REFRESH_INTERVAL = 5000; // Refresh every 5 seconds
-
-function TOLoader() {
     const [eventId, setEventId] = useState('');
     const [submittedEventId, setSubmittedEventId] = useState(null);
     const [countdown, setCountdown] = useState(REFRESH_INTERVAL / 1000);
@@ -113,7 +91,10 @@ function TOLoader() {
     }
 
     if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :(</p>;
+    if (error) {
+        console.error("Error fetching data:", error);
+        return <p>Error :</p>;
+    }
 
     if (!data || !data.event) return <p>No data available</p>;
 
@@ -162,3 +143,5 @@ export default function App() {
         </ApolloProvider>
     );
 }
+
+export default TOLoader;
