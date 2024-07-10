@@ -5,9 +5,11 @@ body {
 }
 
 #root {
-  max-width: 1280px;
+  /* max-width: 1px; */ /* Commented out */
+  width: 100%; /* Added */
+  height: 100vh; /* Ensure it takes the full height of the viewport */
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0rem;
   text-align: center;
   transition: 1s ease, color 1s ease;
 }
