@@ -99,6 +99,7 @@ const REFRESH_INTERVAL = 5000; // Refresh every 5 seconds
     if (!data || !data.event) return <p>No data available</p>;
 
     return (
+        <ApolloProvider client={client}>
         <div style={{ height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: '0px 8px', margin: '10px' }}>
             <Grid container spacing={1} style={{ flex: 1, overflow: 'hidden', display: 'flex', flexWrap: 'wrap', alignContent: 'flex-start' }}>
                 {data.event.sets.nodes.map(({ id, state, station, slots }) => (
@@ -133,15 +134,9 @@ const REFRESH_INTERVAL = 5000; // Refresh every 5 seconds
                 ))}
             </Grid>
         </div>
+        </ApolloProvider>
     );
 } 
 // Wrap your component with the ApolloProvider and pass in your client
-export default function App() {
-    return (
-        <ApolloProvider client={client}>
-            <TOLoader />
-        </ApolloProvider>
-    );
-}
 
 export default TOLoader;
