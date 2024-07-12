@@ -1,0 +1,9 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyBcBjTVVSeTX0ayCDHch-y_S8pa8eUqf3E",
+  authDomain: "smash-helper.firebaseapp.com",
+  projectId: "smash-helper",
+  storageBucket: "smash-helper.appspot.com",
+  messagingSenderId: "35753814329",
+  appId: "1:35753814329:web:5e49225fa36fe102c920e8",
+  measurementId: "G-HDXM3PBWC8"
+};

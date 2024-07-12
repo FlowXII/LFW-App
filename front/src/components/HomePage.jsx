@@ -1,26 +1,17 @@
 import React from 'react';
-import LFWLogout from './LFWLogout';
-import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Typography, Button, Container } from '@mui/material';
+import { Link } from 'react-router-dom'; //Will be used later to navigate to other pages
 
-function HomePage({ user, setUser }) {
+function HomePage() {
     return (
-        <div>
-            <h1>Main Page</h1>
-            {user ? (
-                <div>
-                    <p>Welcome, {user.displayName ? user.displayName : "Guest"}!</p>
-                    <Button variant="contained" color="primary" component={Link} to="/createnote">Create a note</Button>
-                    <LFWLogout setUser={setUser} />
-                    <Link to="/mynotes"> Go to my notes </Link>
-                </div>
-            ) : (
-                <div>
-                    <p>Welcome, Guest! You need to log in to access the note form.</p>
-                    <Link to="/login">Go to Login Page</Link>
-                </div>
-            )}
-        </div>
+        <Container maxWidth="sm" sx={{ mt: 8, textAlign: 'center' }}>
+            <Typography variant="h2" gutterBottom>
+                Welcome to LFW !
+            </Typography>
+            <Typography variant="h5" gutterBottom>
+                You can use various tools for the FGC here.
+            </Typography>
+        </Container>
     );
 }
 

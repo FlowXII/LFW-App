@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemText, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ThemeToggle from './ThemeToggle'; // <-- Add theme toggle import here
+import ThemeToggle from './common/ThemeToggle'; // <-- Add theme toggle import here
 
 const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and handleThemeChange props here
     const navigate = useNavigate();
@@ -33,6 +33,10 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
 
     const handlePlayerLookUp = () => {
         navigate('/playerlookup');
+    }
+
+    const handleGoingHome = () => {
+        navigate('/');
     }
 
     return (
@@ -70,7 +74,10 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
             </List> 
             */}
 
-            <List>    
+            <List>
+                <ListItem sx={{ borderRadius: 8 }} button onClick={handleGoingHome}>
+                        <ListItemText primary='Home' />
+                </ListItem>
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handleTOloader}>
                         <ListItemText primary='TO Loader' />
                 </ListItem>
@@ -80,6 +87,7 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handlePlayerLookUp}>
                         <ListItemText primary='Player Look Up' />
                 </ListItem>
+
             </List>
         </Drawer>
     );
