@@ -5,14 +5,15 @@ import { Box } from '@mui/system';
 import { darkTheme, lightTheme } from './common/theme.jsx';
 import HomePage from './HomePage';
 import Sidebar from "./Sidebar";
-import NextBattle from "./NextBattle";
-import TOloader from "./TOloader.jsx";
+import Dashboard from "./Dashboard";
+import NextBattle from "./TournamentsUpcoming.jsx";
+import TOloader from "./TournamentsStations.jsx";
+import PlayerLookUp from './TournamentsUser.jsx';
 import { ApolloProvider } from '@apollo/client';
-import PlayerLookUp from './PlayerLookUp';
 import client from './ApolloClientProvider';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const handleThemeChange = () => {
     setDarkMode(!darkMode);
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/toloader" element={<TOloader/>} />
                 <Route path="/nextbattle" element={<NextBattle/>} />
                 <Route path='/playerlookup' element={<PlayerLookUp/>} />
+                <Route path="/dashboard" element={<Dashboard />} />
               </Routes>
             </Box>
           </Router>

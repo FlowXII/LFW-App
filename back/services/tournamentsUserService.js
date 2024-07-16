@@ -3,48 +3,61 @@ import dotenv from 'dotenv';
 
 // Load environment variables from a .env file into process.env
 dotenv.config();
+console.log(`StartGG Token: ${process.env.STARTGG_TOKEN}`);
 
 export async function fetchTournaments(userSlug, perPage) {
-  const response = await fetch('https://api.start.gg/gql/alpha', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // Use the environment variable here
-      'Authorization': `Bearer ${process.env.STARTGG_TOKEN}`,
-    },
-    body: JSON.stringify({
-      query: `
-        query TournamentsByUser($userSlug: String!, $perPage: Int!) {
-          user(slug: $userSlug) {
-            name
-            player {
-              id
-              gamerTag
-              prefix
-            }
-            tournaments(query: {perPage: $perPage, filter: {upcoming: true}}) {
-              nodes {
+  console.log(`Fetching tournaments for userSlug: ${userSlug}, perPage: ${perPage}`);
+
+  try {
+    const response = await fetch('https://api.start.gg/gql/alpha', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.STARTGG_TOKEN}`,
+      },
+      body: JSON.stringify({
+        query: `
+          query TournamentsByUser($userSlug: String!, $perPage: Int!) {
+            user(slug: $userSlug) {
+              name
+              player {
                 id
-                name
-                startAt
-                endAt
-                venueAddress
-                city
-                state
-                countryCode
-                slug
+                gamerTag
+                prefix
+              }
+              tournaments(query: {perPage: $perPage, filter: {upcoming: true}}) {
+                nodes {
+                  id
+                  name
+                  startAt
+                  endAt
+                  venueAddress
+                  city
+                  state
+                  countryCode
+                  slug
+                }
               }
             }
           }
-        }
-      `,
-      variables: { userSlug, perPage: parseInt(perPage, 10) },
-    }),
-  });
+        `,
+        variables: { userSlug, perPage: parseInt(perPage, 10) },
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
+    console.log(`Response status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Response data: ${JSON.stringify(data, null, 2)}`);
+
+    return data;
+  } catch (error) {
+    console.error(`Error fetching tournaments: ${error.message}`);
+    throw error;
   }
-
-  return await response.json();
 }
+

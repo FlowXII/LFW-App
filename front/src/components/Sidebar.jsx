@@ -21,8 +21,13 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
         navigate('/login');
     } */
 
-
-
+    const handleGoingHome = () => {
+            navigate('/');
+        }
+    
+    const handleDashboard = () => {
+        navigate('/dashboard');
+    };
     const handleTOloader = () => {
         navigate('/toloader');
     };
@@ -34,10 +39,11 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
     const handlePlayerLookUp = () => {
         navigate('/playerlookup');
     }
-
-    const handleGoingHome = () => {
-        navigate('/');
+    const handleLogin = () => {
+        navigate('/login');
     }
+
+
 
     return (
         <Drawer
@@ -71,6 +77,9 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handleLogin}>
                     <ListItemText primary='Login' />
                 </ListItem>
+                <ListItem sx={{ borderRadius: 8 }} button onClick={handleLogin}>
+                        <ListItemText primary='Login' />
+                </ListItem>
             </List> 
             */}
 
@@ -78,6 +87,10 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handleGoingHome}>
                         <ListItemText primary='Home' />
                 </ListItem>
+                <ListItem sx={{ borderRadius: 8 }} button onClick={handleDashboard}>
+                        <ListItemText primary='Dashboard' />
+                </ListItem>
+
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handleTOloader}>
                         <ListItemText primary='TO Loader' />
                 </ListItem>
@@ -87,6 +100,7 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handlePlayerLookUp}>
                         <ListItemText primary='Player Look Up' />
                 </ListItem>
+
 
             </List>
         </Drawer>

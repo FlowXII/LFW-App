@@ -6,7 +6,9 @@ dotenv.config();
 // Unused for now
 // import protectedRoute from './routes/protectedRoute';
 
-import tournamentsUserRoutes from './routes/tournamentsUserRoute.js';
+import tournamentsUserRoute from './routes/tournamentsUserRoute.js';
+import tournamentsStationsRoute from './routes/tournamentsStationsRoute.js';
+import tournamentsUpcomingRoute from './routes/tournamentsUpcomingRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -16,7 +18,9 @@ app.use(express.json());
 
 // app.use(tokenRoutes);
 
-app.use('/api', tournamentsUserRoutes);
+app.use('/api', tournamentsUserRoute);
+app.use('/api', tournamentsStationsRoute);
+app.use('/api', tournamentsUpcomingRoute);
 
 // Other imports and code remain unchanged
 
