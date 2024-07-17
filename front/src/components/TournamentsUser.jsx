@@ -43,7 +43,7 @@ function PlayerLookUp() {
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={12}>
                                 <TextField
-                                    label="User Slug"
+                                    label="User ID (after /user/ in the url)"
                                     value={userSlug}
                                     onChange={(e) => setUserSlug(e.target.value)}
                                     variant="outlined"
@@ -52,7 +52,7 @@ function PlayerLookUp() {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Per Page"
+                                    label="Maximum Displayed"
                                     type="number"
                                     value={perPage}
                                     onChange={(e) => setPerPage(e.target.value)}

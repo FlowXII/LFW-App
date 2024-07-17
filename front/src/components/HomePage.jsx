@@ -8,8 +8,8 @@ function HomePage() {
             <Typography variant="h2" gutterBottom>
                 Welcome to LFW !
             </Typography>
-            <Typography variant="h5" gutterBottom>
-                You can use various tools for the FGC here.
+            <Typography variant="h6" gutterBottom>
+                This site is made by Flow, and is still in active development. Feel free to look around.
             </Typography>
         </Container>
     );

@@ -1,8 +1,8 @@
 import { fetchStationsTournaments } from '../services/tournamentsStationsService.js';
 
 export const getTournamentsStations = async (req, res) => {
-  // Extract eventId from query parameters
-  const eventId = parseInt(req.query.eventId); // Parse eventId to an integer
+
+  const eventId = parseInt(req.query.eventId); 
 
   try {
     const jsonData = await fetchStationsTournaments(eventId);

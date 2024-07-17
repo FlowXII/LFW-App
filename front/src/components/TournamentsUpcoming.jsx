@@ -21,7 +21,7 @@ function NextBattle() {
     { id: "48559", name: "Mortal Kombat 1" },
     { id: "36963", name: "The King of Fighters XV" },
     { id: "36865", name: "Melty Blood - Type Lumina -" },
-    { id: "0", name: "Under Night In-Birth II Sys:Celes" }, // Placeholder for undefined
+    { id: "50203", name: "Under Night In-Birth II Sys:Celes" }, 
   ];
 
   const handleFormSubmit = async (e) => {
@@ -29,11 +29,7 @@ function NextBattle() {
     setLoading(true);
     setError(null);
 
-    // Construct the URL with query parameters
     const url = `http://localhost:4000/api/upcoming?cCode=${cCode}&perPage=${perPage}&videogameId=${videogameId}`;
-
-    // Log the URL to the console
-    console.log("Fetching URL:", url);
 
     try {
       const response = await fetch(url);
@@ -63,7 +59,7 @@ function NextBattle() {
             fullWidth
           />
           <TextField
-            label="Per Page"
+            label="Maximum Displayed"
             type="number"
             value={perPage}
             onChange={(e) => setPerPage(e.target.value)}

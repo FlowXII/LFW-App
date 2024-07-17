@@ -31,52 +31,55 @@ function TOLoader() {
   const fetchTournaments = async () => {
     try {
       const response = await fetch(`http://localhost:4000/api/stations?eventId=${submittedEventId}`);
-      console.log('Submitted event ID:', submittedEventId); // Check the submitted eventId
-      console.log('Response status:', response.status); // Check the response status
+      console.log('Submitted event ID:', submittedEventId); 
+      console.log('Response status:', response.status); 
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('Response data:', data); // Log the entire response data
+      console.log('Response data:', data);
 
-      // Ensure data structure matches expectations
       if (!data.data || !data.data.event || !data.data.event.sets || !data.data.event.sets.nodes) {
         throw new Error('Unexpected data structure from API');
       }
 
-      // Set the tournamentData state
       setTournamentData(data.data);
     } catch (error) {
       console.error('Error fetching tournaments:', error.message);
-      setTournamentData(null); // Reset tournamentData on error
+      setTournamentData(null);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSubmittedEventId(eventId); // Set submittedEventId to eventId
-    setEventId(''); // Clear eventId input after submission
-    console.log('Submitted event ID:', eventId); // Log the submitted eventId
+    setSubmittedEventId(eventId); 
+    setEventId(''); 
+    console.log('Submitted event ID:', eventId);
   };
 
   return (
-    <Container sx={{ mt: 4 }}>
-      {!submittedEventId ? (
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant='h3' gutterBottom>Station Viewer</Typography>
-          <form onSubmit={handleSubmit} style={{ margin: '20px 0' }}>
+<Container sx={{ mt: 4 }}>
+  {!submittedEventId ? (
+    <Box sx={{ textAlign: 'center' }}>
+      <Typography variant='h3' gutterBottom>Station Viewer</Typography>
+      <form onSubmit={handleSubmit} style={{ margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item>
             <TextField
               label="Enter Event ID"
               value={eventId}
               onChange={(e) => setEventId(e.target.value)}
               variant="outlined"
-              sx={{ mr: 2 }}
             />
+          </Grid>
+          <Grid item>
             <Button type="submit" variant="contained" color="primary">Submit</Button>
-          </form>
-        </Box>
+          </Grid>
+        </Grid>
+      </form>
+    </Box>
       ) : (
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant='h3' gutterBottom>Station Viewer</Typography>

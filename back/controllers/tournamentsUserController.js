@@ -1,4 +1,3 @@
-// C:\Users\boyme\Code\LFW-App\back\controllers\tournamentsUserController.js
 import { fetchTournaments } from '../services/tournamentsUserService.js';
 
 export const getTournamentsByUser = async (req, res) => {

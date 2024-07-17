@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
-// Load environment variables from a .env file into process.env
 dotenv.config();
 console.log(`StartGG Token: ${process.env.STARTGG_TOKEN}`);
 

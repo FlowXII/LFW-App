@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Sample Dashboard Component with Unused Login Buttons
 class Dashboard extends React.Component {
   // Constructor for initializing state and bindings
   constructor(props) {
@@ -8,10 +7,9 @@ class Dashboard extends React.Component {
     this.state = {
       // State variables can be added here
     };
-    // Bind methods here if necessary
+
   }
 
-  // Render method for the Dashboard component
   render() {
     return (
       <div className="dashboard">

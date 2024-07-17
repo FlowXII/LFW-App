@@ -1,25 +1,10 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemText, Button, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemText, Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ThemeToggle from './common/ThemeToggle'; // <-- Add theme toggle import here
+import ThemeToggle from './common/ThemeToggle';
 
-const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and handleThemeChange props here
+const Sidebar = ({ isDark, handleThemeChange }) => { 
     const navigate = useNavigate();
-
-    /*  This used to be an old, note taking app with components that served that purpose, but i'm
-    keeping this here for future reference. I might reuse the login component for a different purpose...
-
-    const handleCreateNote = () => {
-        navigate('/createnote');
-    };
-
-    const handleMyNotes = () => {
-        navigate('/mynotes');
-    };
-    
-    const handleLogin = () => {
-        navigate('/login');
-    } */
 
     const handleGoingHome = () => {
             navigate('/');
@@ -43,8 +28,6 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
         navigate('/login');
     }
 
-
-
     return (
         <Drawer
             variant="permanent"
@@ -58,31 +41,14 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 }
             }}
         >
-        <ThemeToggle isDark={isDark} handleThemeChange={handleThemeChange} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2 }}>
             <Typography variant="h2" gutterBottom>
                 LFW
             </Typography>
             <Typography gutterBottom>
                 Learn, Fight, Win.
             </Typography>
-            
-            {/* Same here. This used to be the navigation for the note taking app, but i'm keeping it here for future reference.
-            <List id='notes'>
-                <ListItem sx={{ borderRadius: 8 }} button onClick={handleCreateNote}>
-                    <ListItemText primary='Create Note' />
-                </ListItem>
-                <ListItem sx={{ borderRadius: 8 }} button onClick={handleMyNotes}>
-                    <ListItemText primary='My Notes' />
-                </ListItem>
-                <ListItem sx={{ borderRadius: 8 }} button onClick={handleLogin}>
-                    <ListItemText primary='Login' />
-                </ListItem>
-                <ListItem sx={{ borderRadius: 8 }} button onClick={handleLogin}>
-                        <ListItemText primary='Login' />
-                </ListItem>
-            </List> 
-            */}
-
+        </Box>
             <List>
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handleGoingHome}>
                         <ListItemText primary='Home' />
@@ -100,10 +66,13 @@ const Sidebar = ({ isDark, handleThemeChange }) => { // <-- Add the isDark and h
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handlePlayerLookUp}>
                         <ListItemText primary='Player Look Up' />
                 </ListItem>
-
-
             </List>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', alignItems: 'end', p: 2 }}>
+                <Typography gutterBottom> Change Lighting </Typography>
+                <ThemeToggle isDark={isDark} handleThemeChange={handleThemeChange} />
+            </Box>
         </Drawer>
+     
     );
 };
 

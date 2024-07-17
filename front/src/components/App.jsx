@@ -9,8 +9,6 @@ import Dashboard from "./Dashboard";
 import NextBattle from "./TournamentsUpcoming.jsx";
 import TOloader from "./TournamentsStations.jsx";
 import PlayerLookUp from './TournamentsUser.jsx';
-import { ApolloProvider } from '@apollo/client';
-import client from './ApolloClientProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -20,16 +18,14 @@ function App() {
   };
 
   return (
-    <ApolloProvider client={client}> {/* Wrap the root component with ApolloProvider */}
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
         <CssBaseline />
         <Box sx={{ display: 'flex' }}>
           <Router>
             <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
-            <Box sx={{flexGrow: 1}}> {/* Add the Box component here */}
+            <Box sx={{flexGrow: 1}}> 
               <Routes>
                 <Route path="/" element={<HomePage/>} />
-                {/* <Route path="/login" element={<LFWAuth setUser={setUser} />} /> */}
                 <Route path="/toloader" element={<TOloader/>} />
                 <Route path="/nextbattle" element={<NextBattle/>} />
                 <Route path='/playerlookup' element={<PlayerLookUp/>} />
@@ -39,7 +35,6 @@ function App() {
           </Router>
         </Box>
       </ThemeProvider>
-    </ApolloProvider>
   );
 }
 
