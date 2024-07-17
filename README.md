@@ -1,0 +1,1 @@
+This app is a work in progress application for tools in the Fighting Game Community. The goal of this app is to make hosting, finding, and attending tournaments less painful, and there's plenty of stuff to be done thanks to start.gg's API.
