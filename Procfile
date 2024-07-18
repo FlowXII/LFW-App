@@ -1,1 +1,1 @@
-web : nodemon -- exec node back/server.js
+web : npm start
