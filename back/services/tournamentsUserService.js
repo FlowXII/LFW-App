@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
 dotenv.config();
-console.log(`StartGG Token: ${process.env.STARTGG_TOKEN}`);
 
 export async function fetchTournaments(userSlug, perPage) {
   console.log(`Fetching tournaments for userSlug: ${userSlug}, perPage: ${perPage}`);

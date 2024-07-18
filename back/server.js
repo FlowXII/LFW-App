@@ -2,8 +2,9 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-dotenv.config();
+import { fileURLToPath } from 'url';
 
+dotenv.config();
 
 import tournamentsUserRoute from './routes/tournamentsUserRoute.js';
 import tournamentsStationsRoute from './routes/tournamentsStationsRoute.js';
@@ -11,6 +12,9 @@ import tournamentsUpcomingRoute from './routes/tournamentsUpcomingRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json());
@@ -32,3 +36,4 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
+
