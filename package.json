@@ -1,0 +1,9 @@
+{
+    "name": "lfw-app",
+    "version": "1.0.0",
+    "scripts": {
+      "start": "node back/server.js",
+      "heroku-postbuild": "cd front && npm install && npm run build"
+    }
+  }
+  
