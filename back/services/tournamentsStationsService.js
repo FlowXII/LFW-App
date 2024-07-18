@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const STARTGG_TOKEN = process.env.STARTGG_TOKEN;
+console.log(`STARTGG_TOKEN: ${STARTGG_TOKEN}`);
 
 export async function fetchStationsTournaments(eventId) {
   console.log(`Fetching tournaments for event ID: ${eventId}`);
