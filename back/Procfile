@@ -1,1 +1,0 @@
-web : cd back && npm run dev
