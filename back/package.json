@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon server.js",
-    "build" : "vite build"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
