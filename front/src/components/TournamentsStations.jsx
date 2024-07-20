@@ -30,7 +30,7 @@ function TOLoader() {
 
   const fetchTournaments = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/stations?eventId=${submittedEventId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/stations?eventId=${submittedEventId}`);
       console.log('Submitted event ID:', submittedEventId); 
       console.log('Response status:', response.status); 
 
