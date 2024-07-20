@@ -29,8 +29,9 @@ function NextBattle() {
     setLoading(true);
     setError(null);
 
-    const url = `http://localhost:4000/api/upcoming?cCode=${cCode}&perPage=${perPage}&videogameId=${videogameId}`;
-
+    const url = `${import.meta.env.VITE_API_BASE_URL}/upcoming?cCode=${cCode}&perPage=${perPage}&videogameId=${videogameId}`;
+    console.log('Environment variables:', import.meta.env.VITE_API_BASE_URL);
+    
     try {
       const response = await fetch(url);
       if (!response.ok) {

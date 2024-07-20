@@ -28,9 +28,11 @@ function TOLoader() {
     }
   }, [submittedEventId]);
 
+  const url = `${import.meta.env.VITE_API_BASE_URL}/stations?eventId=${submittedEventId}`;
+
   const fetchTournaments = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/stations?eventId=${submittedEventId}`);
+      const response = await fetch(url);
       console.log('Submitted event ID:', submittedEventId); 
       console.log('Response status:', response.status); 
 
@@ -73,12 +75,19 @@ function TOLoader() {
               onChange={(e) => setEventId(e.target.value)}
               variant="outlined"
             />
+
           </Grid>
           <Grid item>
             <Button type="submit" variant="contained" color="primary">Submit</Button>
           </Grid>
         </Grid>
       </form>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+              Warning, this feature is meant for now for TO's and testing purposes only ! <br />
+              The event ID can be found in the URL of the admin event page on start.gg <br />
+              (https://www.start.gg/admin/tournament/tournament-for-testing-1/brackets/1140299/1664029/2480004)<br />
+              There, the event ID would be 1140299. (use this number if you wanna test this)
+      </Typography>
     </Box>
       ) : (
         <Box sx={{ textAlign: 'center' }}>

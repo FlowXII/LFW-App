@@ -14,10 +14,7 @@ function PlayerLookUp() {
         setError(null);
 
         // Construct the URL with query parameters
-        const url = `http://localhost:4000/api/tournaments/?userSlug=${userSlug}&perPage=${perPage}`;
-
-        // Log the URL to the console
-        console.log("Fetching URL:", url);
+        const url = `${import.meta.env.VITE_API_BASE_URL}/tournaments/?userSlug=${userSlug}&perPage=${perPage}`;
 
         try {
             const response = await fetch(url);
