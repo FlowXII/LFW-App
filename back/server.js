@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 dotenv.config();
 
-console.log('Environment Variables:', process.env); // Add this line
+console.log('Environment Variables:', process.env.STARTGG_TOKEN); // Add this line
 
 import tournamentsUserRoute from './routes/tournamentsUserRoute.js';
 import tournamentsStationsRoute from './routes/tournamentsStationsRoute.js';
