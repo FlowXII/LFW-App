@@ -30,7 +30,7 @@ function NextBattle() {
     setError(null);
 
     const url = `${import.meta.env.VITE_API_BASE_URL}/upcoming?cCode=${cCode}&perPage=${perPage}&videogameId=${videogameId}`;
-    console.log('Environment variables:', import.meta.env.VITE_API_BASE_URL, import.meta.env.STARTGG_TOKEN);
+    console.log('Environment variables:', import.meta.env.VITE_API_BASE_URL);
     
     try {
       const response = await fetch(url);
