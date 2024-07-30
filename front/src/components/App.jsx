@@ -17,6 +17,7 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+  console.log('Testing changes')
   return (
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
         <CssBaseline />
