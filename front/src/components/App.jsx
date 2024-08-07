@@ -9,6 +9,9 @@ import Dashboard from "./Dashboard";
 import NextBattle from "./TournamentsUpcoming.jsx";
 import TOloader from "./TournamentsStations.jsx";
 import PlayerLookUp from './TournamentsUser.jsx';
+import Login from './Login';
+import { AuthProvider } from './AuthContext.jsx';
+import withAuth from './withAuth.jsx';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -22,18 +25,21 @@ function App() {
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
         <CssBaseline />
         <Box sx={{ display: 'flex' }}>
-          <Router>
-            <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
-            <Box sx={{flexGrow: 1}}> 
-              <Routes>
-                <Route path="/" element={<HomePage/>} />
-                <Route path="/toloader" element={<TOloader/>} />
-                <Route path="/nextbattle" element={<NextBattle/>} />
-                <Route path='/playerlookup' element={<PlayerLookUp/>} />
-                <Route path="/dashboard" element={<Dashboard />} />
-              </Routes>
-            </Box>
-          </Router>
+          <AuthProvider>
+            <Router>
+              <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
+              <Box sx={{flexGrow: 1}}> 
+                <Routes>
+                  <Route path="/" element={<HomePage/>} />
+                  <Route path="/toloader" element={<TOloader/>} />
+                  <Route path="/nextbattle" element={<NextBattle/>} />
+                  <Route path='/playerlookup' element={<PlayerLookUp/>} />
+                  <Route path="/dashboard" element={<Dashboard/>} />
+                  <Route path="/login" element={<Login />} />
+                </Routes>
+              </Box>
+            </Router>
+          </AuthProvider>
         </Box>
       </ThemeProvider>
   );

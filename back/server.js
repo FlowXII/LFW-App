@@ -5,12 +5,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
-
-console.log('Environment Variables:', process.env.STARTGG_TOKEN,process.env.VITE_API_BASE_URL); // Add this line
-
 import tournamentsUserRoute from './routes/tournamentsUserRoute.js';
 import tournamentsStationsRoute from './routes/tournamentsStationsRoute.js';
 import tournamentsUpcomingRoute from './routes/tournamentsUpcomingRoute.js';
+import oAuthRoute from './routes/oauthRoute.js';
+import callbackRoute from './routes/callbackRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -21,16 +20,22 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
+// typical API routes 
 app.use('/api', tournamentsUserRoute);
 app.use('/api', tournamentsStationsRoute);
 app.use('/api', tournamentsUpcomingRoute);
 
+// OAuth routes
+app.use('/', oAuthRoute);
+app.use('/auth', callbackRoute);
+
+// Serve the front-end
 app.use(express.static(path.join(__dirname, '../front/dist')));
 
+// Serve the front-end for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../front/dist', 'index.html'));
 });
-
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

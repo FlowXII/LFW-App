@@ -66,6 +66,9 @@ const Sidebar = ({ isDark, handleThemeChange }) => {
                 <ListItem sx={{ borderRadius: 8 }} button onClick={handlePlayerLookUp}>
                         <ListItemText primary='Player Look Up' />
                 </ListItem>
+                <ListItem sx={{ borderRadius: 8 }} button onClick={handleLogin}>
+                        <ListItemText primary='Login' />
+                </ListItem>
             </List>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', alignItems: 'end', p: 2 }}>
                 <Typography gutterBottom> Change Lighting </Typography>
