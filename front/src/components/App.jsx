@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Container, ThemeProvider, CssBaseline } from '@mui/material';
-import { Box } from '@mui/system';
+import { CssBaseline, Container, ThemeProvider} from '@mui/material';
 import { darkTheme, lightTheme } from './common/theme.jsx';
+import { Box } from '@mui/system';
 import HomePage from './HomePage';
 import Sidebar from "./Sidebar";
 import Dashboard from "./Dashboard";
@@ -10,6 +10,7 @@ import NextBattle from "./TournamentsUpcoming.jsx";
 import TOloader from "./TournamentsStations.jsx";
 import PlayerLookUp from './TournamentsUser.jsx';
 import Login from './Login';
+import Profile from './Profile';
 import { AuthProvider } from './AuthContext.jsx';
 import withAuth from './withAuth.jsx';
 
@@ -36,6 +37,7 @@ function App() {
                   <Route path='/playerlookup' element={<PlayerLookUp/>} />
                   <Route path="/dashboard" element={<Dashboard/>} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/profile" element={<Profile />} />
                 </Routes>
               </Box>
             </Router>

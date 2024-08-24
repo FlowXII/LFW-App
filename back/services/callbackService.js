@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const handleOAuthCallback = async (code) => {
+export const handleOAuthCallback = async (code, req) => {
   if (!code) {
     throw new Error('Authorization code is missing');
   }
@@ -35,6 +35,7 @@ export const handleOAuthCallback = async (code) => {
     });
 
     const accessToken = tokenResponse.data.access_token;
+    req.session.accessToken = accessToken;
     console.log('Access Token:', accessToken);
 
     return { redirectUrl: '/dashboard' };

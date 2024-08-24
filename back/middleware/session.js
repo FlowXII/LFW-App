@@ -1,10 +1,12 @@
 import session from 'express-session';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const sessionMiddleware = session({
-  secret: 'fightnights93', // Replace with a strong secret key
-  resave: false,
+  secret: process.env.SESSION_SECRET,
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: false }  // Set to true if using HTTPS
+  cookie: { secure: process.env.NODE_ENV === 'production' }
 });
 
 export default sessionMiddleware;

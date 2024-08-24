@@ -25,7 +25,23 @@ const Sidebar = ({ isDark, handleThemeChange }) => {
     return (
         <>
             <IconButton 
-                sx={{ display: isMobile ? 'block' : 'none', position: 'absolute', top: 16, left: 16, zIndex: 1200 }} 
+                sx={{ 
+                    display: isMobile ? 'block' : 'none', 
+                    position: 'absolute', 
+                    top: 16, 
+                    left: 16, 
+                    zIndex: 1200,
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    borderRadius: '50%',
+                    width: 56,
+                    height: 56,
+                    boxShadow: 3,
+                    '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                        boxShadow: 6,
+                    }
+                }} 
                 onClick={handleToggle}
             >
                 {open ? <CloseIcon /> : <MenuIcon />}
