@@ -5,7 +5,6 @@
         "node": "20.x"
     },
     "scripts": {
-        "start": "node back/server.js",
-        "heroku-postbuild": "npm install --prefix back && npm install --prefix front && npm run build --prefix front"
+        "start": "node back/server.js"
     }
 }
