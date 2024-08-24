@@ -13,7 +13,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "/back/server.js"
+        "dest": "/front/dist"
       }
     ]
   }
