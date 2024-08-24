@@ -6,8 +6,7 @@
         "use": "@vercel/node"
       },
       {
-        "src": "front",
-        "command": "npm run build"
+        "src": "front"
       }
     ],
     "routes": [
