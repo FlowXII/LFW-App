@@ -4,6 +4,10 @@
       {
         "src": "back/server.js",
         "use": "@vercel/node"
+      },
+      {
+        "src": "front",
+        "command": "npm run build"
       }
     ],
     "routes": [
@@ -13,7 +17,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "/front/dist"
+        "dest": "front/dist"
       }
     ]
   }
