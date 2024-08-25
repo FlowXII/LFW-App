@@ -6,7 +6,11 @@
         "use": "@vercel/node"
       },
       {
-        "src": "front"
+        "src": "front/package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "front/dist"
+        }
       }
     ],
     "routes": [
