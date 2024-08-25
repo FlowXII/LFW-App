@@ -7,7 +7,7 @@
       },
       {
         "src": "front/dist/**/*",
-        "use": "@vercel/static",
+        "use": "npm run build",
         "config": {
         "distDir": "front/dist"
       }
