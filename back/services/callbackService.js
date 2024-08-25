@@ -37,6 +37,7 @@ export const handleOAuthCallback = async (code, req) => {
     const accessToken = tokenResponse.data.access_token;
     req.session.accessToken = accessToken;
     console.log('Access Token:', accessToken);
+    console.log(req.session.accessToken);
 
     return { redirectUrl: '/dashboard' };
   } catch (error) {
