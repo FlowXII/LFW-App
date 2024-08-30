@@ -14,6 +14,7 @@ const Dashboard = () => {
         const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`);
         setDashboardData(response.data.data?.currentUser || null);
         setLoading(false);
+        console.log(response);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Failed to fetch dashboard data');
@@ -33,7 +34,7 @@ const Dashboard = () => {
       <CardContent>
         <Typography variant="h5" gutterBottom>{tournament.name}</Typography>
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>{event.name}</Typography>
-        <Box display="flex" alignItems="center" mb={1}>
+        <Box display="flex" alignItems="center" flexDirection={'column'} mb={1}>
           <EventNote sx={{ mr: 1 }} />
           <Typography variant="body2">
             {new Date(tournament.startAt * 1000).toLocaleDateString()} - {new Date(tournament.endAt * 1000).toLocaleDateString()}
@@ -50,18 +51,26 @@ const Dashboard = () => {
         {event.sets.nodes.length > 0 && (
           <>
             <Divider sx={{ my: 2 }} />
-            <Typography variant="subtitle2" gutterBottom>Recent Sets:</Typography>
+            <Typography variant="h5" gutterBottom>You have to play !</Typography>
             <List dense>
               {event.sets.nodes.slice(0, 3).map((set) => (
                 <ListItem key={set.id}>
                   <ListItemText
-                    primary={`Set ID: ${set.id}`}
-                    secondary={`Station: ${set.station?.number || 'N/A'}`}
-                  />
-                  <Chip label={set.state} size="small" color="primary" />
-                </ListItem>
-              ))}
-            </List>
+                    primary={
+                      <>
+                        {set.slots.slice(0, 2).map((slot, index) => (
+                          <Typography key={slot.id} variant="body2">
+                            {`Player ${index + 1}: ${slot.entrant?.name || 'TBD'}`}
+                          </Typography>
+                        ))}
+                      </>
+                    }
+        secondary={`Station: ${set.station?.number || 'N/A'}`}
+      />
+      <Chip label={set.state} size="small" color="primary" />
+    </ListItem>
+  ))}
+</List>
           </>
         )}
       </CardContent>
@@ -76,15 +85,12 @@ const Dashboard = () => {
             <Box display="flex" flexDirection="column" alignItems="center">
               <Avatar 
                 src={dashboardData.images?.[1]?.url} 
-                alt={dashboardData.player?.gamerTag || dashboardData.name || 'User'}
+                alt={dashboardData.player?.gamerTag || 'User'}
                 sx={{ width: 200, height: 200, mb: 2 }}
               />
-              <Typography variant="h4" gutterBottom>
-                {dashboardData.player?.gamerTag || dashboardData.name || 'User'}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" gutterBottom>
-                {dashboardData.location?.country}
-              </Typography>
+            <Typography variant="h4" gutterBottom>
+            {dashboardData.player?.gamerTag ||'User'}
+            </Typography>
             </Box>
           </Grid>
           <Grid item xs={12} md={8}>
