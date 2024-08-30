@@ -2,8 +2,6 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 dotenv.config();
 
-console.log(process.env.NODE_ENV);
-console.log(process.env);
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: true,
