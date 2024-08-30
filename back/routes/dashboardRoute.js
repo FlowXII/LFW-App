@@ -6,7 +6,7 @@ dotenv.config();
 
 const router = express.Router();
 
-router.get('/profile', async (req, res) => {
+router.get('/dashboard', async (req, res) => {
   // Check if the user is authenticated (not checking it anymore temporarily)
   /*
   if (!req.session || !req.session.accessToken) {
@@ -17,13 +17,9 @@ router.get('/profile', async (req, res) => {
     const accessToken = process.env.TEMPORARY_OAUTH_TOKEN;
     // Define the GraphQL query
     const query = `
-query CurrentUserQuery {
+query DashboardQuery {
   currentUser {
-    id
     name
-    bio
-    birthday
-    genderPronoun
     location {
       city
       state
@@ -42,7 +38,7 @@ query CurrentUserQuery {
       prefix
     }
     tournaments(query: {
-      perPage: 20,
+      perPage: 1,
       filter: { upcoming: false }
     }) {
       nodes {
@@ -92,7 +88,7 @@ query CurrentUserQuery {
   
 
     // Send a POST request with the GraphQL query
-    const profileResponse = await axios.post('https://api.start.gg/gql/alpha', 
+    const dashboardResponse = await axios.post('https://api.start.gg/gql/alpha', 
       { query },
       {
         headers: {
@@ -102,7 +98,7 @@ query CurrentUserQuery {
       }
     );
 
-    res.json(profileResponse.data);
+    res.json(dashboardResponse.data);
   } catch (error) {
     console.error('Error fetching user profile:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -110,4 +106,3 @@ query CurrentUserQuery {
 });
 
 export default router;
-

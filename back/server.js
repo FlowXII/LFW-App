@@ -13,6 +13,7 @@ import oAuthRoute from './routes/oauthRoute.js';
 import callbackRoute from './routes/callbackRoute.js';
 import checkSession from './routes/checkSession.js';
 import profileGetRoute from './routes/profileGetRoute.js';
+import dashboardRoute from './routes/dashboardRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -37,6 +38,10 @@ app.use('/auth', callbackRoute);
 // Routes for login/profile
 app.use('/api', checkSession);
 app.use('/api', profileGetRoute);
+
+// Route for dashboard
+app.use('/api', dashboardRoute);
+
 
 // Serve the front-end
 app.use(express.static(path.join(__dirname, '../front/dist')));
