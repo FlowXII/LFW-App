@@ -100,7 +100,7 @@ query DashboardQuery {
 
     res.json(dashboardResponse.data);
   } catch (error) {
-    console.error('Error fetching user profile:', error.message);
+    console.error('Error fetching user dashboard', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
