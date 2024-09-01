@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, Typography, Grid, Avatar, Container, Box, CircularProgress, Chip } from '@mui/material';
 import { EventNote, LocationOn, Person } from '@mui/icons-material';
 import axios from 'axios';
@@ -7,11 +7,19 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const dashboardDataRef = useRef(null);
+
+  useEffect(() => {
+    dashboardDataRef.current = dashboardData;
+  }, [dashboardData]);
 
   const fetchDashboardData = useCallback(async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`);
-      return response.data.data?.currentUser || null;
+      console.log('Fetched dashboard data:', response.data);
+      const currentUserData = response.data.data?.currentUser || null;
+      console.log('Extracted currentUser data:', currentUserData);
+      return currentUserData;
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError('Failed to fetch dashboard data');
@@ -20,43 +28,95 @@ const Dashboard = () => {
   }, []);
 
   const sendNotification = useCallback((title, options) => {
+    console.log('Attempting to send notification:', { title, options });
     if (Notification.permission === 'granted') {
-      new Notification(title, options);
+      console.log('Notification permission is granted');
+      try {
+        new Notification(title, options);
+        console.log('Notification sent successfully');
+      } catch (error) {
+        console.error('Error sending notification:', error);
+      }
+    } else {
+      console.warn('Notification permission not granted');
     }
   }, []);
 
-  const checkForUpdates = useCallback((newData, oldData) => {
-    if (!oldData || !newData) return;
+  const checkForUpdates = useCallback((newData) => {
+    console.log('Checking for updates');
+    const oldData = dashboardDataRef.current;
+    console.log('Old data:', oldData);
+    console.log('New data:', newData);
+    if (!oldData || !newData) {
+      console.log('No old or new data available for comparison');
+      return;
+    }
 
     newData.tournaments.nodes.forEach((newTournament, tIndex) => {
       newTournament.events.forEach((newEvent, eIndex) => {
         const oldEvent = oldData.tournaments.nodes[tIndex]?.events[eIndex];
-        if (!oldEvent) return;
+        if (!oldEvent) {
+          console.log('No matching old event found');
+          return;
+        }
 
         newEvent.sets.nodes.forEach((newSet, sIndex) => {
           const oldSet = oldEvent.sets.nodes[sIndex];
-          if (!oldSet) return;
+          if (!oldSet) {
+            console.log('No matching old set found');
+            return;
+          }
 
+          console.log('Comparing set states:', { old: oldSet.state, new: newSet.state });
           if (newSet.state !== oldSet.state) {
+            console.log('Set state changed');
             const isPlayerInvolved = newSet.slots.some(slot => 
               slot.entrant?.name === newData.player?.gamerTag
             );
 
+            console.log('Is player involved:', isPlayerInvolved);
             if (isPlayerInvolved) {
               let notificationTitle, notificationBody;
-              if (newSet.state === '6') {
-                notificationTitle = 'Match Called!';
-                notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been called. Station: ${newSet.station?.number || 'N/A'}`;
-              } else if (newSet.state === '2') {
-                notificationTitle = 'Match Started!';
-                notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has begun. Station: ${newSet.station?.number || 'N/A'}`;
+              
+              // Updated state change handling
+              switch (newSet.state) {
+                case '1':
+                  notificationTitle = 'Match Created';
+                  notificationBody = `A new match has been created for you at ${newTournament.name} (${newEvent.name}).`;
+                  break;
+                case '2':  // Match Started
+                  notificationTitle = 'Match Started';
+                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has begun. Station: ${newSet.station?.number || 'N/A'}`;
+                  break;
+                case '3':
+                  notificationTitle = 'Match Completed';
+                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been completed.`;
+                  break;
+                case '4':
+                  notificationTitle = 'Match Result Reported';
+                  notificationBody = `Results for your match at ${newTournament.name} (${newEvent.name}) have been reported.`;
+                  break;
+                case '5':  // Match Ready to Start
+                  notificationTitle = 'Match Ready to Start';
+                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) is ready to start. Please proceed to station ${newSet.station?.number || 'N/A'}.`;
+                  break;
+                case '6':  // Match Called
+                  notificationTitle = 'Match Called';
+                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been called. Please proceed to station: ${newSet.station?.number || 'N/A'}`;
+                  break;
+                default:
+                  notificationTitle = 'Match Status Update';
+                  notificationBody = `There's been an update to your match at ${newTournament.name} (${newEvent.name}). Go to station : ${newSet.station?.number || 'N/A'} !`;
               }
 
+              console.log('Notification prepared:', { title: notificationTitle, body: notificationBody });
               if (notificationTitle) {
                 sendNotification(notificationTitle, {
                   body: notificationBody,
                   icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
                 });
+              } else {
+                console.log('No notification title set');
               }
             }
           }
@@ -66,12 +126,21 @@ const Dashboard = () => {
   }, [sendNotification]);
 
   useEffect(() => {
+    console.log('Dashboard component mounted');
+
     if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
+      console.log('Requesting notification permission');
+      Notification.requestPermission().then(permission => {
+        console.log('Notification permission result:', permission);
+      });
+    } else {
+      console.log('Notification permission already granted');
     }
 
     const initialFetch = async () => {
+      console.log('Performing initial data fetch');
       const data = await fetchDashboardData();
+      console.log('Initial data set to state:', data);
       setDashboardData(data);
       setLoading(false);
     };
@@ -79,15 +148,22 @@ const Dashboard = () => {
     initialFetch();
 
     const interval = setInterval(async () => {
+      console.log('Polling for updates');
       const newData = await fetchDashboardData();
       if (newData) {
-        checkForUpdates(newData, dashboardData);
+        console.log('New data fetched, checking for updates');
+        checkForUpdates(newData);
         setDashboardData(newData);
+      } else {
+        console.log('No new data fetched');
       }
-    }, 30000); // Poll every 10 seconds
+    }, 10000);
 
-    return () => clearInterval(interval);
-  }, [fetchDashboardData, checkForUpdates, dashboardData]);
+    return () => {
+      console.log('Dashboard component unmounting, clearing interval');
+      clearInterval(interval);
+    };
+  }, [fetchDashboardData, checkForUpdates]);  // Removed dashboardData from dependencies
 
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;

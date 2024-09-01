@@ -7,14 +7,20 @@ dotenv.config();
 const router = express.Router();
 
 router.get('/dashboard', async (req, res) => {
-  // Check if the user is authenticated (not checking it anymore temporarily)
+  console.log('Dashboard route accessed');
+
+  // Uncomment if you need authentication checks
   /*
   if (!req.session || !req.session.accessToken) {
+    console.log('Unauthorized access attempt');
     return res.status(401).json({ error: 'Unauthorized' });
   }
   */
+
   try {
     const accessToken = process.env.TEMPORARY_OAUTH_TOKEN;
+    console.log('Access token retrieved:', accessToken ? 'Yes' : 'No');
+
     // Define the GraphQL query
     const query = `
 query DashboardQuery {
@@ -85,7 +91,8 @@ query DashboardQuery {
   }
 }
 `;
-  
+
+    console.log('GraphQL query defined');
 
     // Send a POST request with the GraphQL query
     const dashboardResponse = await axios.post('https://api.start.gg/gql/alpha', 
@@ -98,9 +105,11 @@ query DashboardQuery {
       }
     );
 
+    console.log('Dashboard data retrieved successfully');
+
     res.json(dashboardResponse.data);
   } catch (error) {
-    console.error('Error fetching user dashboard', error.message);
+    console.error('Error fetching user dashboard:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
