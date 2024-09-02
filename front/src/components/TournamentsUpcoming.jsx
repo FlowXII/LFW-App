@@ -51,7 +51,7 @@ function NextBattle() {
     <Box sx={{ p: 2 }}>
       <Typography variant='h3' gutterBottom>Upcoming Tournaments</Typography>
       <form onSubmit={handleFormSubmit}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'center', gap: 2, mb: 2 }}>
           <TextField
             label="Country Code"
             value={cCode}

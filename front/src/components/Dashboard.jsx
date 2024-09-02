@@ -51,7 +51,7 @@ const Dashboard = () => {
       console.log('No old or new data available for comparison');
       return;
     }
-
+  
     newData.tournaments.nodes.forEach((newTournament, tIndex) => {
       newTournament.events.forEach((newEvent, eIndex) => {
         const oldEvent = oldData.tournaments.nodes[tIndex]?.events[eIndex];
@@ -59,25 +59,26 @@ const Dashboard = () => {
           console.log('No matching old event found');
           return;
         }
-
+  
         newEvent.sets.nodes.forEach((newSet, sIndex) => {
           const oldSet = oldEvent.sets.nodes[sIndex];
           if (!oldSet) {
             console.log('No matching old set found');
             return;
           }
-
+  
           console.log('Comparing set states:', { old: oldSet.state, new: newSet.state });
+          console.log(newSet.state);
           if (newSet.state !== oldSet.state) {
             console.log('Set state changed');
             const isPlayerInvolved = newSet.slots.some(slot => 
               slot.entrant?.name === newData.player?.gamerTag
             );
-
+  
             console.log('Is player involved:', isPlayerInvolved);
             if (isPlayerInvolved) {
               let notificationTitle, notificationBody;
-              
+  
               // Updated state change handling
               switch (newSet.state) {
                 case '1':
@@ -104,11 +105,8 @@ const Dashboard = () => {
                   notificationTitle = 'Match Called';
                   notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been called. Please proceed to station: ${newSet.station?.number || 'N/A'}`;
                   break;
-                default:
-                  notificationTitle = 'Match Status Update';
-                  notificationBody = `There's been an update to your match at ${newTournament.name} (${newEvent.name}). Go to station : ${newSet.station?.number || 'N/A'} !`;
               }
-
+  
               console.log('Notification prepared:', { title: notificationTitle, body: notificationBody });
               if (notificationTitle) {
                 sendNotification(notificationTitle, {
@@ -208,7 +206,7 @@ const Dashboard = () => {
                 <Box key={set.id} sx={{ border: '1px solid #444', borderRadius: '4px', mb: 2, p: 2 }}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mb={2}>
                     <Typography variant="h6" fontWeight="bold">
-                      Your match is at Station: {set.station?.number || 'N/A'}
+                      Station : {set.station?.number || 'N/A'}
                     </Typography>
                     {getSetStateChip(set.state)}
                   </Box>

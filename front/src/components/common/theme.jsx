@@ -50,10 +50,10 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#90caf9', // Example primary color
+      main: '#9e66d4', // Example primary color
     },
     secondary: {
-      main: '#f48fb1', // Example secondary color
+      main: '#e8c564', // Example secondary color
     },
     background: {
       default: '#121212',

@@ -21,11 +21,33 @@ router.get('/dashboard', async (req, res) => {
     const accessToken = process.env.TEMPORARY_OAUTH_TOKEN;
     console.log('Access token retrieved:', accessToken ? 'Yes' : 'No');
 
-    // Define the GraphQL query
-    const query = `
+    const userNameQuery = `
+query {
+  currentUser {
+    name
+  }
+}
+`;
+
+const userNameResponse = await axios.post('https://api.start.gg/gql/alpha', 
+  { query: userNameQuery },
+  {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  }
+);
+
+const userName = userNameResponse.data.data.currentUser.name;
+console.log('User name retrieved:', userName);
+
+
+const dashboardQuery = `
 query DashboardQuery {
   currentUser {
     name
+    id
     location {
       city
       state
@@ -64,6 +86,16 @@ query DashboardQuery {
           state
           numEntrants
           slug
+          entrants(query: {
+            page: 1,
+            perPage: 20,
+            filter: { name: "${userName}" }
+          }) {
+            nodes {
+              id
+              name
+            }
+          }
           sets(
             page: 1
             perPage: 20
@@ -96,7 +128,7 @@ query DashboardQuery {
 
     // Send a POST request with the GraphQL query
     const dashboardResponse = await axios.post('https://api.start.gg/gql/alpha', 
-      { query },
+      { query: dashboardQuery },
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
