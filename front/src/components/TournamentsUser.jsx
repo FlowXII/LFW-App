@@ -33,7 +33,7 @@ function PlayerLookUp() {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Typography variant='h3' gutterBottom> Tournaments by User </Typography>
+            <Typography variant='h4' gutterBottom> Tournaments by User </Typography>
             <Grid container spacing={2} justifyContent="center">
                 <Grid item xs={12} md={6} lg={4}>
                     <form onSubmit={handleFormSubmit}>

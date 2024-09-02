@@ -21,29 +21,38 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  console.log('Testing changes')
+
   return (
-      <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-        <CssBaseline />
-        <Box sx={{ display: 'flex' }}>
-          <AuthProvider>
-            <Router>
-              <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange}/>
-              <Box sx={{flexGrow: 1}}> 
-                <Routes>
-                  <Route path="/" element={<HomePage/>} />
-                  <Route path="/toloader" element={<TOloader/>} />
-                  <Route path="/nextbattle" element={<NextBattle/>} />
-                  <Route path='/playerlookup' element={<PlayerLookUp/>} />
-                  <Route path="/dashboard" element={<Dashboard/>} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/profile" element={<Profile />} />
-                </Routes>
-              </Box>
-            </Router>
-          </AuthProvider>
-        </Box>
-      </ThemeProvider>
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
+        <AuthProvider>
+          <Router>
+            <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange} />
+            <Box
+              component="main"
+              sx={{
+                flexGrow: 0,
+                pl: -3,
+                width: { xs: 'calc(100% - 72px)', sm: 'calc(100% - 500px)' },
+                marginLeft: { xs: '0px', sm: '250px' },
+                overflowX: 'hidden',
+              }}
+            >
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/toloader" element={<TOloader />} />
+                <Route path="/nextbattle" element={<NextBattle />} />
+                <Route path='/playerlookup' element={<PlayerLookUp />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/profile" element={<Profile />} />
+              </Routes>
+            </Box>
+          </Router>
+        </AuthProvider>
+      </Box>
+    </ThemeProvider>
   );
 }
 

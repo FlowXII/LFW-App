@@ -91,7 +91,7 @@ function TOLoader() {
     </Box>
       ) : (
         <Box sx={{ textAlign: 'center' }}>
-          <Typography variant='h3' gutterBottom>Station Viewer</Typography>
+          <Typography variant='h4' gutterBottom>Station Viewer</Typography>
           <Typography variant="h5" gutterBottom>
             Current Matches :
           </Typography>

@@ -49,7 +49,7 @@ function NextBattle() {
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant='h3' gutterBottom>Upcoming Tournaments</Typography>
+      <Typography variant='h4' gutterBottom>Upcoming Tournaments</Typography>
       <form onSubmit={handleFormSubmit}>
         <Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'center', gap: 2, mb: 2 }}>
           <TextField
@@ -57,7 +57,7 @@ function NextBattle() {
             value={cCode}
             onChange={(e) => setCode(e.target.value)}
             variant="outlined"
-            fullWidth
+            sx={{ width: { xs: '100%', sm: '400px', md: '500px' } }}
           />
           <TextField
             label="Maximum Displayed"
@@ -65,14 +65,14 @@ function NextBattle() {
             value={perPage}
             onChange={(e) => setPerPage(e.target.value)}
             variant="outlined"
-            fullWidth
+            sx={{ width: { xs: '100%', sm: '400px', md: '500px' } }}
           />
           <Select
             value={videogameId}
             onChange={(e) => setVideogameId(e.target.value)}
             variant="outlined"
-            fullWidth
-            label="Videogame"
+            sx={{ width: { xs: '100%', sm: '400px', md: '500px' } }}
+            label=""
           >
             {videogameOptions.map((option) => (
               <MenuItem key={option.id} value={option.id}>
@@ -113,7 +113,6 @@ function NextBattle() {
 }
 
 export default NextBattle;
-
 
 
 
