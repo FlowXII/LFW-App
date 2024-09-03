@@ -11,15 +11,13 @@ export const AuthProvider = ({ children }) => {
   
   const checkAuthStatus = async () => {
     try {
-      console.log(url);
       const response = await fetch(url, {
-        credentials: 'include' 
+        credentials: 'include'
       });
       const data = await response.json();
       setIsAuthenticated(data.isAuthenticated);
-      console.log(data);
     } catch (error) {
-      console.error('Error checking authentication status:', error);
+      console.error('Error checking auth status:', error);
       setIsAuthenticated(false);
     }
   };
