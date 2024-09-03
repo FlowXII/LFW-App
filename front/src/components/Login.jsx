@@ -2,8 +2,9 @@ import React from 'react';
 import { Typography, Button, Box } from '@mui/material';
 
 const Login = () => {
+    const url =`${import.meta.env.VITE_BACKEND}/oauth_redirect`;
     const handleLogin = () => {
-        window.location.href = '/oauth_redirect';
+        window.location.href = url;
     };
 
     return (

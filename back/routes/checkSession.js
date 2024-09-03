@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-router.get('/check-session', (req, res) => {
+router.get('/check_session', (req, res) => {
   console.log("accessing session...");
     if (req.session && req.session.accessToken) {
       console.log(req.session.accessToken);

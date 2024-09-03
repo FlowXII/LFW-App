@@ -9,16 +9,13 @@ const router = express.Router();
 router.get('/dashboard', async (req, res) => {
   console.log('Dashboard route accessed');
 
-  // Uncomment if you need authentication checks
-  /*
   if (!req.session || !req.session.accessToken) {
     console.log('Unauthorized access attempt');
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  */
 
   try {
-    const accessToken = process.env.TEMPORARY_OAUTH_TOKEN;
+    const accessToken = req.session.accessToken;
     console.log('Access token retrieved:', accessToken ? 'Yes' : 'No');
 
     const userNameQuery = `

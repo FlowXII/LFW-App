@@ -7,15 +7,14 @@ dotenv.config();
 const router = express.Router();
 
 router.get('/profile', async (req, res) => {
-  // Check if the user is authenticated (not checking it anymore temporarily)
-  /*
+  
   if (!req.session || !req.session.accessToken) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  */
+
   try {
-    const accessToken = process.env.TEMPORARY_OAUTH_TOKEN;
-    // Define the GraphQL query
+    const accessToken = req.session.accessToken;
+
     const query = `
 query CurrentUserQuery {
   currentUser {

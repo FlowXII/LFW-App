@@ -10,12 +10,11 @@ const withAuth = (Component) => {
     useEffect(() => {
       const verifyAuth = async () => {
         try {
-          // Optionally call a method to verify authentication status from the backend
-          await checkAuthStatus(); // This could be an async call that verifies the authentication status
+          await checkAuthStatus();
         } catch (error) {
           console.error('Error verifying authentication status:', error);
         } finally {
-          setLoading(false); // Set loading to false once verification is done
+          setLoading(false);
         }
       };
 
@@ -23,11 +22,11 @@ const withAuth = (Component) => {
     }, [checkAuthStatus]);
 
     if (loading) {
-      return <div>Loading...</div>; // Show a loading indicator while verifying
+      return <div>Loading...</div>;
     }
 
     if (!isAuthenticated) {
-      return <Navigate to="/login" />;
+      return <Navigate to="/login" replace />;
     }
 
     return <Component {...props} />;

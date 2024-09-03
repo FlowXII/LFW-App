@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { CssBaseline, Container, ThemeProvider} from '@mui/material';
+import { CssBaseline, ThemeProvider} from '@mui/material';
 import { darkTheme, lightTheme } from './common/theme.jsx';
 import { Box } from '@mui/system';
 import HomePage from './HomePage';
@@ -14,13 +14,15 @@ import Profile from './Profile';
 import { AuthProvider } from './AuthContext.jsx';
 import withAuth from './withAuth.jsx';
 
+// Create an authenticated version of the Dashboard component
+const AuthenticatedDashboard = withAuth(Dashboard);
+
 function App() {
   const [darkMode, setDarkMode] = useState(true);
 
   const handleThemeChange = () => {
     setDarkMode(!darkMode);
   };
-
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -44,7 +46,7 @@ function App() {
                 <Route path="/toloader" element={<TOloader />} />
                 <Route path="/nextbattle" element={<NextBattle />} />
                 <Route path='/playerlookup' element={<PlayerLookUp />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={<AuthenticatedDashboard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<Profile />} />
               </Routes>
