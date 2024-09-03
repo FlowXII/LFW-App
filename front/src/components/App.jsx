@@ -34,8 +34,8 @@ function App() {
               sx={{
                 flexGrow: 0,
                 pl: -3,
-                width: { xs: 'calc(100% - 72px)', sm: 'calc(100% - 500px)' },
-                marginLeft: { xs: '0px', sm: '250px' },
+                width: { xs: 'calc(100% - 72px)', sm: '100%' },
+                marginLeft: { xs: '0px', sm: '0px' },
                 overflowX: 'hidden',
               }}
             >

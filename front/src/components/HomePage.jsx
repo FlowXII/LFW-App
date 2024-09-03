@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'; //Will be used later to navigate to oth
 function HomePage() {
     return (
         <Container maxWidth="sm" sx={{ mt: 8, textAlign: 'center' }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography variant="h4" gutterBottom>
                 Welcome to LFW !
             </Typography>
             <Typography variant="h6" gutterBottom>

@@ -118,7 +118,7 @@ function TOLoader() {
                               </Typography>
                             </CardContent>
                           </Card>
-                          <Card sx={{ width: '100%', bgcolor: '#590507', color: 'white' }}>
+                          <Card sx={{ width: '100%', bgcolor: 'theme', color: 'white' }}>
                             <CardContent>
                               <Typography variant="h6">
                                 {slots[1]?.entrant?.name || 'TBD'}

@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import LoginIcon from '@mui/icons-material/Login';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -32,33 +33,35 @@ const Sidebar = ({ isDark, handleThemeChange }) => {
     { text: 'Station Viewer', icon: <ViewModuleIcon />, path: '/toloader' },
     { text: 'Tournaments by game/country', icon: <SportsEsportsIcon />, path: '/nextbattle' },
     { text: 'Tournaments by Player', icon: <PersonSearchIcon />, path: '/playerlookup' },
+    { text: 'Login', icon: <LoginIcon />, path: '/login' }, 
   ];
 
   const drawerWidth = isFullWidth ? 250 : 72;
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: theme.palette.background.paper,
-          color: theme.palette.text.primary,
-          borderRight: `1px solid ${theme.palette.divider}`,
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-          overflowX: 'hidden',
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
-    >
+<Drawer
+  variant="permanent"
+  sx={{
+    width: drawerWidth,
+    flexShrink: 0,
+    '& .MuiDrawer-paper': {
+      width: drawerWidth,
+      boxSizing: 'border-box',
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+      borderRight: `1px solid ${theme.palette.divider}`,
+      transition: theme.transitions.create(['width', 'transform'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      overflowX: 'hidden',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      transform: 'translateZ(100px)', // This moves the drawer 100px along the z-axis
+    },
+  }}
+>
       <Box
         sx={{
           display: 'flex',
@@ -78,7 +81,7 @@ const Sidebar = ({ isDark, handleThemeChange }) => {
           </Typography>
         )}
       </Box>
-      <List sx={{ flexGrow: 1, py: 1, overflowY: 'auto' }}>
+            <List sx={{ flexGrow: 1, py: 1, overflowY: 'auto' }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
             <Tooltip title={isFullWidth ? '' : item.text} placement="right">
