@@ -4,15 +4,6 @@
     {
       "src": "back/server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "front/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "installCommand": "npm install",
-        "buildCommand": "npm run build",
-        "distDir": "front/dist"
-      }
     }
   ],
   "routes": [
