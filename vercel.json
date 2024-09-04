@@ -4,21 +4,9 @@
     {
       "src": "back/server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "front/dist/**/*",
-      "use": "@vercel/static"
     }
-  ],
-  "headers": [
-    {
-      "source": "/(.*).js",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
-        }
-      ]
-    }
+  ], 
+  "rewrites":  [
+      {"source": "/(.*)", "destination": "/"}
   ]
 }
