@@ -10,16 +10,6 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "back/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "front/dist/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*).js",
