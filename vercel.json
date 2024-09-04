@@ -4,6 +4,10 @@
     {
       "src": "back/server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "front/dist/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
