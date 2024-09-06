@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
 dotenv.config();
-console.log(`STARTGG_TOKEN: ${process.env.STARTGG_TOKEN}`);
 
 export async function fetchUpcomingTournaments(cCode, perPage, videogameId) {
   console.log(`Fetching tournaments for countryCode: ${cCode}, perPage: ${perPage}, videogameId: ${videogameId}`);
