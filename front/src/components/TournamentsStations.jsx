@@ -111,14 +111,14 @@ function TOLoader() {
                           {state === 2 ? 'Ongoing' : 'Called'}
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
-                          <Card sx={{ width: '100%', bgcolor: '#102385', color: 'white' }}>
+                          <Card sx={{ width: '100%', bgcolor: '#1976d2', color: 'white' }}>
                             <CardContent>
                               <Typography variant="h6">
                                 {slots[0]?.entrant?.name || 'TBD'}
                               </Typography>
                             </CardContent>
                           </Card>
-                          <Card sx={{ width: '100%', bgcolor: 'theme', color: 'white' }}>
+                          <Card sx={{ width: '100%', bgcolor: '#dc004e', color: 'white' }}>
                             <CardContent>
                               <Typography variant="h6">
                                 {slots[1]?.entrant?.name || 'TBD'}
