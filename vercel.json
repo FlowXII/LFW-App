@@ -4,9 +4,23 @@
     {
       "src": "back/server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "front/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
-  ], 
-  "rewrites":  [
-      {"source": "/(.*)", "destination": "/"}
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/back/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/back/server.js"
+    }
   ]
 }

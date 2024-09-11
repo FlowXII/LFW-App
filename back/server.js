@@ -21,10 +21,8 @@ const PORT = process.env.PORT || 4000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
-  credentials: true
-}));
+// Corrected CORS usage
+app.use(cors());
 
 app.use(express.json());
 app.use(sessionMiddleware);
@@ -33,7 +31,6 @@ app.use(sessionMiddleware);
 app.use('/api', tournamentsUserRoute);
 app.use('/api', tournamentsStationsRoute);
 app.use('/api', tournamentsUpcomingRoute);
-
 
 // OAuth routes
 app.use('/', oAuthRoute);
@@ -46,7 +43,6 @@ app.use('/api', profileGetRoute);
 // Route for dashboard
 app.use('/api', dashboardRoute);
 
-
 // Serve the front-end
 app.use(express.static(path.join(__dirname, '../front/dist')));
 
@@ -54,6 +50,7 @@ app.use(express.static(path.join(__dirname, '../front/dist')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../front/dist', 'index.html'));
 });
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`Welcome ! Server running on port ${PORT} !`);
