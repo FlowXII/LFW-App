@@ -28,7 +28,7 @@ function TOLoader() {
     }
   }, [submittedEventId]);
 
-  const url = `${import.meta.env.VITE_API_BASE_URL}/stations?eventId=${submittedEventId}`;
+  const url = `${window.location.origin}/api/stations?eventId=${submittedEventId}`;
 
   const fetchTournaments = async () => {
     try {
