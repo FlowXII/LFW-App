@@ -11,6 +11,7 @@ import {
   Container,
   useTheme,
 } from '@mui/material';
+import { motion } from 'framer-motion';
 
 const REFRESH_INTERVAL = 5000;
 
@@ -19,6 +20,8 @@ function TOLoader() {
   const [eventId, setEventId] = useState('');
   const [submittedEventId, setSubmittedEventId] = useState(null);
   const [tournamentData, setTournamentData] = useState(null);
+  const [lastAddedId, setLastAddedId] = useState(null);
+  const [previousIds, setPreviousIds] = useState(new Set());
 
   useEffect(() => {
     if (submittedEventId) {
@@ -51,6 +54,21 @@ function TOLoader() {
     }
   };
 
+  useEffect(() => {
+    if (tournamentData && tournamentData.event && tournamentData.event.sets && tournamentData.event.sets.nodes) {
+      const currentIds = new Set(tournamentData.event.sets.nodes.map(set => set.id));
+      if (lastAddedId === null) {
+        setLastAddedId(currentIds.size > 0 ? Array.from(currentIds)[currentIds.size - 1] : null);
+      } else {
+        const newId = Array.from(currentIds).find(id => !previousIds.has(id));
+        if (newId) {
+          setLastAddedId(newId);
+        }
+      }
+      setPreviousIds(currentIds);
+    }
+  }, [tournamentData]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmittedEventId(eventId);
@@ -63,6 +81,13 @@ function TOLoader() {
     if (totalCards <= 16) return 3;
     if (totalCards <= 25) return 2.4;
     return 2;
+  };
+
+  const MotionGrid = motion(Grid);
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
   };
 
   return (
@@ -123,7 +148,14 @@ function TOLoader() {
                 <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Grid container spacing={2} sx={{ m: 0, width: '100%' }}>
                     {tournamentData.event.sets.nodes.map(({ id, state, station, slots }) => (
-                      <Grid item xs={getCardSize(tournamentData.event.sets.nodes.length)} key={id}>
+                      <MotionGrid 
+                        item 
+                        xs={getCardSize(tournamentData.event.sets.nodes.length)} 
+                        key={id}
+                        variants={cardVariants}
+                        initial={id === lastAddedId ? "hidden" : "visible"}
+                        animate="visible"
+                      >
                         <Card sx={{ 
                           height: '100%', 
                           display: 'flex', 
@@ -135,7 +167,7 @@ function TOLoader() {
                         }}>
                           <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
                             <Typography variant="subtitle1" component="div">
-                              Station {station.number}
+                              Station {station?.number || 'N/A'}
                             </Typography>
                             <Typography variant="caption" component="div" sx={{ color: state === 6 ? theme.palette.warning.main : 'inherit' }}>
                               {state === 2 ? 'Ongoing' : 'Called'}
@@ -158,7 +190,7 @@ function TOLoader() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
+                      </MotionGrid>
                     ))}
                   </Grid>
                 </Box>
