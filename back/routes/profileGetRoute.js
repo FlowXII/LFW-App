@@ -1,98 +1,61 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
 const router = express.Router();
 
 router.get('/profile', async (req, res) => {
-  
-  if (!req.session || !req.session.accessToken) {
+  console.log('Profile route accessed');
+
+  const token = req.cookies.jwt;
+  if (!token) {
+    console.log('No JWT found in cookies');
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   try {
-    const accessToken = req.session.accessToken;
+    // Verify and decode the JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const accessToken = decoded.accessToken;
+    console.log('Access token retrieved from JWT:', accessToken ? 'Yes' : 'No');
 
-    const query = `
-query CurrentUserQuery {
-  currentUser {
-    id
-    name
-    bio
-    birthday
-    genderPronoun
-    location {
-      city
-      state
-      country
-      countryId
-    }
-    images {
-      id
-      type
-      url
-    }
-    slug
-    player {
-      id
-      gamerTag
-      prefix
-    }
-    tournaments(query: {
-      perPage: 20,
-      filter: { upcoming: false }
-    }) {
-      nodes {
+    const profileQuery = `
+    query ProfileQuery {
+      currentUser {
         id
         name
-        startAt
-        endAt
-        venueAddress
-        city
-        state
-        countryCode
-        slug
-        events {
-          id
-          name
-          startAt
+        bio
+        birthday
+        genderPronoun
+        location {
+          city
           state
-          numEntrants
-          slug
-          sets(
-            page: 1
-            perPage: 20
-            filters: { state: [2, 6] }  # State 2 is Ongoing, State 6 is Called
-          ) {
-            nodes {
-              id
-              state
-              station {
-                id
-                number
-              }
-              slots {
-                id
-                entrant {
-                  id
-                  name
-                }
-              }
-            }
-          }
+          country
+          countryId
+        }
+        images {
+          id
+          type
+          url
+        }
+        slug
+        player {
+          id
+          gamerTag
+          prefix
         }
       }
     }
-  }
-}
-`;
-  
+    `;
+
+    console.log('GraphQL query defined');
 
     // Send a POST request with the GraphQL query
     const profileResponse = await axios.post('https://api.start.gg/gql/alpha', 
-      { query },
+      { query: profileQuery },
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -101,9 +64,14 @@ query CurrentUserQuery {
       }
     );
 
+    console.log('Profile data retrieved successfully');
+
     res.json(profileResponse.data);
   } catch (error) {
     console.error('Error fetching user profile:', error.message);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
