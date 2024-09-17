@@ -66,8 +66,9 @@ router.get('/dashboard', async (req, res) => {
           prefix
         }
         tournaments(query: {
-          perPage: 1,
-          filter: { upcoming: false }
+        perPage: 1,
+        sort: endAt,
+        filter: { upcoming: false }
         }) {
           nodes {
             id
