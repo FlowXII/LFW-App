@@ -17,78 +17,46 @@ const Dashboard = () => {
   const fetchDashboardData = useCallback(async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
-        withCredentials: true // This ensures cookies are sent with the request
+        withCredentials: true
       });
-      console.log('Fetched dashboard data:', response.data);
-      const currentUserData = response.data.data?.currentUser || null;
-      console.log('Extracted currentUser data:', currentUserData);
-      return currentUserData;
+      return response.data.data?.currentUser || null;
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
       setError('Failed to fetch dashboard data');
       return null;
     }
   }, []);
 
   const sendNotification = useCallback((title, options) => {
-    console.log('Attempting to send notification:', { title, options });
+    if (!('Notification' in window)) return;
     if (Notification.permission === 'granted') {
-      console.log('Notification permission is granted');
       try {
         new Notification(title, options);
-        console.log('Notification sent successfully');
       } catch (error) {
         console.error('Error sending notification:', error);
       }
-    } else {
-      console.warn('Notification permission not granted');
     }
   }, []);
 
   const checkForUpdates = useCallback((newData) => {
-    console.log('Checking for updates');
     const oldData = dashboardDataRef.current;
-    console.log('Old data:', oldData);
-    console.log('New data:', newData);
-    if (!oldData || !newData) {
-      console.log('No old or new data available for comparison');
-      return;
-    }
-  
+    if (!oldData || !newData) return;
     newData.tournaments.nodes.forEach((newTournament) => {
+      const oldTournament = oldData.tournaments.nodes.find(t => t.id === newTournament.id);
+      if (!oldTournament) return;
       newTournament.events.forEach((newEvent) => {
-        const oldEvent = oldData.tournaments.nodes.find(t => t.id === newTournament.id)?.events.find(e => e.id === newEvent.id);
-        if (!oldEvent) {
-          console.log('No matching old event found');
-          return;
-        }
-  
+        const oldEvent = oldTournament.events.find(e => e.id === newEvent.id);
+        if (!oldEvent) return;
         newEvent.sets.nodes.forEach((newSet, sIndex) => {
           const oldSet = oldEvent.sets.nodes[sIndex];
-          if (!oldSet) {
-            console.log('No matching old set found');
-            return;
-          }
-  
-          console.log('Comparing set states:', { old: oldSet.state, new: newSet.state });
-          console.log(newSet.state);
-          if (newSet.state !== oldSet.state) {
-            console.log('Set state changed');
-            const isPlayerInvolved = newSet.slots.some(slot => 
-              slot.entrant?.name === newData.player?.gamerTag
-            );
-  
-            console.log('Is player involved:', isPlayerInvolved);
-            if (isPlayerInvolved) {
-              const notificationTitle = 'Match Update';
-              const notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been updated. New state: ${newSet.state}`;
-  
-              console.log('Notification prepared:', { title: notificationTitle, body: notificationBody });
-              sendNotification(notificationTitle, {
-                body: notificationBody,
-                icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
-              });
-            }
+          if (!oldSet || newSet.state === oldSet.state) return;
+          const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag);
+          if (isPlayerInvolved) {
+            const notificationTitle = 'Match Update';
+            const notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been updated. New state: ${newSet.state}`;
+            sendNotification(notificationTitle, {
+              body: notificationBody,
+              icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+            });
           }
         });
       });
@@ -96,12 +64,8 @@ const Dashboard = () => {
   }, [sendNotification]);
 
   useEffect(() => {
-    console.log('Dashboard component mounted');
-
     const initialFetch = async () => {
-      console.log('Performing initial data fetch');
       const data = await fetchDashboardData();
-      console.log('Initial data set to state:', data);
       setDashboardData(data);
       setLoading(false);
     };
@@ -109,27 +73,20 @@ const Dashboard = () => {
     initialFetch();
 
     const interval = setInterval(async () => {
-      console.log('Polling for updates');
       const newData = await fetchDashboardData();
       if (newData) {
-        console.log('New data fetched, updating state');
+        checkForUpdates(newData);
         setDashboardData(newData);
-      } else {
-        console.log('No new data fetched');
       }
     }, 10000);
 
-    return () => {
-      console.log('Dashboard component unmounting, clearing interval');
-      clearInterval(interval);
-    };
-  }, [fetchDashboardData]);
+    return () => clearInterval(interval);
+  }, [fetchDashboardData, checkForUpdates]);
 
   const requestNotificationPermission = () => {
+    if (!('Notification' in window)) return;
     Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        setNotificationsEnabled(true);
-      }
+      if (permission === 'granted') setNotificationsEnabled(true);
     });
   };
 
@@ -138,9 +95,7 @@ const Dashboard = () => {
   if (!dashboardData) return <Typography>No dashboard data available</Typography>;
 
   const TournamentEventCard = ({ tournament, event, loggedInPlayerName }) => {
-    const playerSets = event.sets.nodes.filter(set => 
-      set.slots.some(slot => slot.entrant?.name === loggedInPlayerName)
-    );
+    const playerSets = event.sets.nodes.filter(set => set.slots.some(slot => slot.entrant?.name === loggedInPlayerName));
 
     const getSetStateChip = (state) => {
       if (state === '6') return <Chip label="Called" size="small" sx={{ bgcolor: 'orange', color: 'white' }} />;
@@ -175,27 +130,13 @@ const Dashboard = () => {
               {playerSets.map((set) => (
                 <Box key={set.id} sx={{ border: '1px solid #444', borderRadius: '4px', mb: 2, p: 2 }}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mb={2}>
-                    <Typography variant="h6" fontWeight="bold">
-                      Station : {set.station?.number || 'N/A'}
-                    </Typography>
+                    <Typography variant="h6" fontWeight="bold">Station : {set.station?.number || 'N/A'}</Typography>
                     {getSetStateChip(set.state)}
                   </Box>
                   <Box display="flex" justifyContent="space-between" width="100%">
                     {set.slots.map((slot, index) => (
-                      <Box 
-                        key={slot.id} 
-                        sx={{ 
-                          bgcolor: index === 0 ? '#102385' : '#590507', 
-                          p: 1, 
-                          borderRadius: '4px',
-                          flex: 1,
-                          mr: index === 0 ? 1 : 0
-                        }}
-                      >
-                        <Typography variant="body1">
-                          Player {index + 1}: <strong>{slot.entrant?.name || 'TBD'}</strong>
-                          {slot.entrant?.name === loggedInPlayerName && ' (You)'}
-                        </Typography>
+                      <Box key={slot.id} sx={{ bgcolor: index === 0 ? '#102385' : '#590507', p: 1, borderRadius: '4px', flex: 1, mr: index === 0 ? 1 : 0 }}>
+                        <Typography variant="body1">Player {index + 1}: <strong>{slot.entrant?.name || 'TBD'}</strong>{slot.entrant?.name === loggedInPlayerName && ' (You)'}</Typography>
                       </Box>
                     ))}
                   </Box>
@@ -219,9 +160,7 @@ const Dashboard = () => {
                 alt={dashboardData.player?.gamerTag || 'User'}
                 sx={{ width: 200, height: 200, mb: 2 }}
               />
-              <Typography variant="h4" gutterBottom>
-                {dashboardData.player?.gamerTag || 'User'}
-              </Typography>
+              <Typography variant="h4" gutterBottom>{dashboardData.player?.gamerTag || 'User'}</Typography>
               <Button
                 variant="contained"
                 startIcon={<Notifications />}
