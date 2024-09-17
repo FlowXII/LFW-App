@@ -9,11 +9,13 @@ import {
   Button,
   CircularProgress,
   Container,
+  useTheme,
 } from '@mui/material';
 
 const REFRESH_INTERVAL = 5000;
 
 function TOLoader() {
+  const theme = useTheme();
   const [eventId, setEventId] = useState('');
   const [submittedEventId, setSubmittedEventId] = useState(null);
   const [tournamentData, setTournamentData] = useState(null);
@@ -64,7 +66,14 @@ function TOLoader() {
   };
 
   return (
-    <Container sx={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Container sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      overflow: 'hidden',
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.text.primary,
+    }}>
       {!submittedEventId ? (
         <Box sx={{ textAlign: 'center', my: 'auto' }}>
           <Typography variant='h3' gutterBottom>Station Viewer</Typography>
@@ -76,6 +85,16 @@ function TOLoader() {
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
                   variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: theme.palette.primary.main,
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.light,
+                      },
+                    },
+                  }}
                 />
               </Grid>
               <Grid item>
@@ -83,7 +102,7 @@ function TOLoader() {
               </Grid>
             </Grid>
           </form>
-          <Typography variant="body2" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ mt: 1, color: theme.palette.text.secondary }}>
             Warning, this feature is meant for now for TO's and testing purposes only! <br />
             The event ID can be found in the URL of the admin event page on start.gg <br />
             (https://www.start.gg/admin/tournament/tournament-for-testing-1/brackets/1140299/1664029/2480004)<br />
@@ -100,42 +119,56 @@ function TOLoader() {
             <CircularProgress sx={{ margin: 'auto' }} />
           ) : (
             tournamentData.event && tournamentData.event.sets && tournamentData.event.sets.nodes ? (
-              <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <Grid container spacing={2} sx={{ m: 0, width: '100%' }}>
-                  {tournamentData.event.sets.nodes.map(({ id, state, station, slots }) => (
-                    <Grid item xs={getCardSize(tournamentData.event.sets.nodes.length)} key={id}>
-                      <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderColor: state === 2 ? 'white' : state === 6 ? 'orange' : 'inherit', borderWidth: 2, borderStyle: 'solid' }}>
-                        <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
-                          <Typography variant="subtitle1" component="div">
-                            Station {station.number}
-                          </Typography>
-                          <Typography variant="caption" component="div" sx={{ color: state === 6 ? 'orange' : 'inherit' }}>
-                            {state === 2 ? 'Ongoing' : 'Called'}
-                          </Typography>
-                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                            <Card sx={{ width: '100%', bgcolor: '#1976d2', color: 'white' }}>
-                              <CardContent sx={{ p: 0.5, '&:last-child': { pb: 0.5 } }}>
-                                <Typography variant="caption" noWrap>
-                                  {slots[0]?.entrant?.name || 'TBD'}
-                                </Typography>
-                              </CardContent>
-                            </Card>
-                            <Card sx={{ width: '100%', bgcolor: '#dc004e', color: 'white' }}>
-                              <CardContent sx={{ p: 0.5, '&:last-child': { pb: 0.5 } }}>
-                                <Typography variant="caption" noWrap>
-                                  {slots[1]?.entrant?.name || 'TBD'}
-                                </Typography>
-                              </CardContent>
-                            </Card>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
+              tournamentData.event.sets.nodes.length > 0 ? (
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <Grid container spacing={2} sx={{ m: 0, width: '100%' }}>
+                    {tournamentData.event.sets.nodes.map(({ id, state, station, slots }) => (
+                      <Grid item xs={getCardSize(tournamentData.event.sets.nodes.length)} key={id}>
+                        <Card sx={{ 
+                          height: '100%', 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          borderColor: state === 2 ? theme.palette.success.main : state === 6 ? theme.palette.warning.main : 'inherit', 
+                          borderWidth: 2, 
+                          borderStyle: 'solid',
+                          backgroundColor: theme.palette.background.paper,
+                        }}>
+                          <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
+                            <Typography variant="subtitle1" component="div">
+                              Station {station.number}
+                            </Typography>
+                            <Typography variant="caption" component="div" sx={{ color: state === 6 ? theme.palette.warning.main : 'inherit' }}>
+                              {state === 2 ? 'Ongoing' : 'Called'}
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                              <Card sx={{ width: '100%', bgcolor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
+                                <CardContent sx={{ p: 0.5, '&:last-child': { pb: 0.5 } }}>
+                                  <Typography variant="caption" noWrap>
+                                    {slots[0]?.entrant?.name || 'TBD'}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                              <Card sx={{ width: '100%', bgcolor: theme.palette.secondary.main, color: theme.palette.secondary.contrastText }}>
+                                <CardContent sx={{ p: 0.5, '&:last-child': { pb: 0.5 } }}>
+                                  <Typography variant="caption" noWrap>
+                                    {slots[1]?.entrant?.name || 'TBD'}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              ) : (
+                <Typography variant="body1" sx={{ margin: 'auto' }}>
+                  No stations are currently active for this event.
+                </Typography>
+              )
             ) : (
-              <Typography variant="body1">
+              <Typography variant="body1" sx={{ margin: 'auto' }}>
                 No data available for this event.
               </Typography>
             )
