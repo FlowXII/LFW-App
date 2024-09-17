@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cookieParserMiddleware from './middleware/cookieParserMiddleware.js';
 
 dotenv.config();
 import sessionMiddleware from './middleware/session.js';
@@ -25,6 +26,7 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 
 app.use(express.json());
+app.use(cookieParserMiddleware); // Use the cookie parser middleware
 app.use(sessionMiddleware);
 
 // typical API routes 
@@ -58,4 +60,3 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
-
