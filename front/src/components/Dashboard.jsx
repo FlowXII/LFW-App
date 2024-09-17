@@ -230,6 +230,18 @@ const Dashboard = () => {
     );
   };
 
+  // Add this function to filter tournaments and events
+  const filterUserTournaments = (dashboardData) => {
+    if (!dashboardData || !dashboardData.tournaments) return [];
+
+    return dashboardData.tournaments.nodes.map(tournament => ({
+      ...tournament,
+      events: tournament.events.filter(event => 
+        event.entrants.nodes.some(entrant => entrant.name === dashboardData.player?.gamerTag)
+      )
+    })).filter(tournament => tournament.events.length > 0);
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
@@ -248,8 +260,8 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={9}>
             <Typography variant="h4" gutterBottom>Your Tournaments</Typography>
-            {dashboardData.tournaments.nodes.length > 0 ? (
-              dashboardData.tournaments.nodes.flatMap((tournament) => 
+            {filterUserTournaments(dashboardData).length > 0 ? (
+              filterUserTournaments(dashboardData).flatMap((tournament) => 
                 tournament.events.map((event) => (
                   <TournamentEventCard 
                     key={`${tournament.id}-${event.id}`} 
@@ -260,7 +272,7 @@ const Dashboard = () => {
                 ))
               )
             ) : (
-              <Typography>No upcoming tournaments found.</Typography>
+              <Typography>No upcoming tournaments found where you are registered.</Typography>
             )}
           </Grid>
         </Grid>
