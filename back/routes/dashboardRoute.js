@@ -44,68 +44,77 @@ router.get('/dashboard', async (req, res) => {
     console.log('User name retrieved:', userName);
 
     const dashboardQuery = `
-query DashboardQuery {
-  currentUser {
-    name
-    id
-    location {
-      city
-      state
-      country
-      countryId
-    }
-    images {
-      id
-      type
-      url
-    }
-    slug
-    player {
-      id
-      gamerTag
-      prefix
-    }
-    tournaments(query: { perPage: 1, filter: { upcoming: false } }) {
-      nodes {
-        id
+    query DashboardQuery {
+      currentUser {
         name
-        startAt
-        endAt
-        venueAddress
-        city
-        state
-        countryCode
-        slug
-        events(filter: { playerIds: [$id] }) {
-          id
-          name
-          startAt
+        id
+        location {
+          city
           state
-          numEntrants
-          slug
-          entrants(query: { page: 1, perPage: 20, filter: { name: "${userName}" } }) {
-            nodes {
+          country
+          countryId
+        }
+        images {
+          id
+          type
+          url
+        }
+        slug
+        player {
+          id
+          gamerTag
+          prefix
+        }
+        tournaments(query: {
+          perPage: 1,
+          filter: { upcoming: false }
+        }) {
+          nodes {
+            id
+            name
+            startAt
+            endAt
+            venueAddress
+            city
+            state
+            countryCode
+            slug
+            events {
               id
               name
-            }
-          }
-          sets(
-            page: 1
-            perPage: 20
-            filters: { state: [2, 6] }
-          ) {
-            nodes {
-              id
+              startAt
               state
-              station {
-                id
-                number
-              }
-              slots {
-                id
-                entrant {
+              numEntrants
+              slug
+              entrants(query: {
+                page: 1,
+                perPage: 20,
+                filter: { name: "${userName}" }
+              }) {
+                nodes {
                   id
                   name
+                }
+              }
+              sets(
+                page: 1
+                perPage: 20
+                filters: { state: [2, 6] }  # State 2 is Ongoing, State 6 is Called
+              ) {
+                nodes {
+                  id
+                  state
+                  station {
+                    id
+                    number
+                  }
+                  slots {
+                    id
+                    entrant {
+                      id
+                      name
+                    }
+                  }
                 }
               }
             }
@@ -113,8 +122,6 @@ query DashboardQuery {
         }
       }
     }
-  }
-}
     `;
 
     console.log('GraphQL query defined');
