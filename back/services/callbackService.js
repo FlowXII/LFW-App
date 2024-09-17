@@ -14,13 +14,14 @@ export const handleOAuthCallback = async (code, res) => {
   const clientSecret = process.env.CLIENT_SECRET;
   const redirectUri = process.env.REDIRECT_URI;
   const jwtSecret = process.env.JWT_SECRET;
+  const frontendUrl = process.env.FRONTEND_URL; // Add this line
 
-  console.log('Client ID:', clientId); // Debug log
-  console.log('Client Secret:', clientSecret ? '***' : 'Missing'); // Debug log
-  console.log('Redirect URI:', redirectUri); // Debug log
+  console.log('Client ID:', clientId);
+  console.log('Client Secret:', clientSecret ? '***' : 'Missing');
+  console.log('Redirect URI:', redirectUri);
 
-  if (!clientId || !clientSecret || !redirectUri || !jwtSecret) {
-    return res.status(500).json({ error: 'Client ID, Client Secret, Redirect URI, or JWT Secret is missing.' });
+  if (!clientId || !clientSecret || !redirectUri || !jwtSecret || !frontendUrl) {
+    return res.status(500).json({ error: 'Client ID, Client Secret, Redirect URI, JWT Secret, or Frontend URL is missing.' });
   }
 
   try {
@@ -43,10 +44,16 @@ export const handleOAuthCallback = async (code, res) => {
     const jwtToken = jwt.sign({ accessToken }, jwtSecret, { expiresIn: '1h' });
     console.log('JWT Token:', jwtToken);
 
-    // Send JWT to client (e.g., set it as a cookie)
-    res.cookie('jwt', jwtToken, { httpOnly: true, secure: true });
+    // Set JWT as a cookie
+    res.cookie('jwt', jwtToken, { 
+      httpOnly: true, 
+      secure: true, 
+      sameSite: 'strict',
+      maxAge: 3600000 // 1 hour in milliseconds
+    });
 
-    return res.json({ redirectUrl: '/dashboard' });
+    // Redirect to the frontend dashboard
+    return res.redirect(`${frontendUrl}/dashboard`);
   } catch (error) {
     console.error('Error during OAuth callback handling:', error.response ? error.response.data : error.message);
     return res.status(500).json({ error: 'Error during OAuth callback handling' });

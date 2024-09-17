@@ -15,8 +15,6 @@ const Dashboard = () => {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      // With cookie-parser, cookies are automatically sent with the request
-      // We don't need to manually add them to the headers
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
         withCredentials: true // This ensures cookies are sent with the request
       });
@@ -130,15 +128,6 @@ const Dashboard = () => {
   useEffect(() => {
     console.log('Dashboard component mounted');
 
-    if (Notification.permission !== 'granted') {
-      console.log('Requesting notification permission');
-      Notification.requestPermission().then(permission => {
-        console.log('Notification permission result:', permission);
-      });
-    } else {
-      console.log('Notification permission already granted');
-    }
-
     const initialFetch = async () => {
       console.log('Performing initial data fetch');
       const data = await fetchDashboardData();
@@ -153,8 +142,7 @@ const Dashboard = () => {
       console.log('Polling for updates');
       const newData = await fetchDashboardData();
       if (newData) {
-        console.log('New data fetched, checking for updates');
-        checkForUpdates(newData);
+        console.log('New data fetched, updating state');
         setDashboardData(newData);
       } else {
         console.log('No new data fetched');
@@ -165,7 +153,7 @@ const Dashboard = () => {
       console.log('Dashboard component unmounting, clearing interval');
       clearInterval(interval);
     };
-  }, [fetchDashboardData, checkForUpdates]);  // Removed dashboardData from dependencies
+  }, [fetchDashboardData]);
 
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
