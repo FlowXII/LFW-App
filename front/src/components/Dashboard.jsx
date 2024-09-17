@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const dashboardDataRef = useRef(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [lastPlayerSetsCount, setLastPlayerSetsCount] = useState(0);
 
   useEffect(() => {
     dashboardDataRef.current = dashboardData;
@@ -37,9 +38,28 @@ const Dashboard = () => {
     }
   }, []);
 
+  const notifyPlayerToPlay = (newData) => {
+    const newPlayerSetsCount = newData.tournaments.nodes.flatMap(tournament =>
+      tournament.events.flatMap(event =>
+        event.sets.nodes.filter(set =>
+          set.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag)
+        )
+      )
+    ).length;
+
+    if (newPlayerSetsCount > lastPlayerSetsCount) {
+      sendNotification('You have to play!', {
+        body: 'A new match is available for you to play.',
+        icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+      });
+    }
+    setLastPlayerSetsCount(newPlayerSetsCount);
+  };
+
   const checkForUpdates = useCallback((newData) => {
     const oldData = dashboardDataRef.current;
     if (!oldData || !newData) return;
+
     newData.tournaments.nodes.forEach((newTournament) => {
       const oldTournament = oldData.tournaments.nodes.find(t => t.id === newTournament.id);
       if (!oldTournament) return;
@@ -61,7 +81,9 @@ const Dashboard = () => {
         });
       });
     });
-  }, [sendNotification]);
+
+    notifyPlayerToPlay(newData);
+  }, [sendNotification, lastPlayerSetsCount]);
 
   useEffect(() => {
     const initialFetch = async () => {
@@ -196,3 +218,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
