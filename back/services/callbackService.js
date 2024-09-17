@@ -7,19 +7,20 @@ dotenv.config();
 
 export const handleOAuthCallback = async (code, res) => {
   if (!code) {
-    throw new Error('Authorization code is missing');
+    return res.status(400).json({ error: 'Authorization code is missing' });
   }
 
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
   const redirectUri = process.env.REDIRECT_URI;
+  const jwtSecret = process.env.JWT_SECRET;
 
   console.log('Client ID:', clientId); // Debug log
   console.log('Client Secret:', clientSecret ? '***' : 'Missing'); // Debug log
   console.log('Redirect URI:', redirectUri); // Debug log
 
-  if (!clientId || !clientSecret || !redirectUri) {
-    throw new Error('Client ID, Client Secret, or Redirect URI is missing.');
+  if (!clientId || !clientSecret || !redirectUri || !jwtSecret) {
+    return res.status(500).json({ error: 'Client ID, Client Secret, Redirect URI, or JWT Secret is missing.' });
   }
 
   try {
@@ -39,20 +40,15 @@ export const handleOAuthCallback = async (code, res) => {
     console.log('Access Token:', accessToken);
 
     // Generate JWT
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      throw new Error('JWT Secret is missing.');
-    }
-
     const jwtToken = jwt.sign({ accessToken }, jwtSecret, { expiresIn: '1h' });
     console.log('JWT Token:', jwtToken);
 
     // Send JWT to client (e.g., set it as a cookie)
     res.cookie('jwt', jwtToken, { httpOnly: true, secure: true });
 
-    return { redirectUrl: '/dashboard' };
+    return res.json({ redirectUrl: '/dashboard' });
   } catch (error) {
     console.error('Error during OAuth callback handling:', error.response ? error.response.data : error.message);
-    throw new Error('Error during OAuth callback handling');
+    return res.status(500).json({ error: 'Error during OAuth callback handling' });
   }
 };
