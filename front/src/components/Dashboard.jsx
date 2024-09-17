@@ -15,7 +15,11 @@ const Dashboard = () => {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`);
+      // With cookie-parser, cookies are automatically sent with the request
+      // We don't need to manually add them to the headers
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
+        withCredentials: true // This ensures cookies are sent with the request
+      });
       console.log('Fetched dashboard data:', response.data);
       const currentUserData = response.data.data?.currentUser || null;
       console.log('Extracted currentUser data:', currentUserData);
