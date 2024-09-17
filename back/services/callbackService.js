@@ -13,14 +13,13 @@ export const handleOAuthCallback = async (code, res) => {
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
   const redirectUri = process.env.REDIRECT_URI;
-  const jwtSecret = process.env.JWT_SECRET;
 
   console.log('Client ID:', clientId); // Debug log
   console.log('Client Secret:', clientSecret ? '***' : 'Missing'); // Debug log
   console.log('Redirect URI:', redirectUri); // Debug log
 
-  if (!clientId || !clientSecret || !redirectUri || !jwtSecret) {
-    throw new Error('Client ID, Client Secret, Redirect URI, or JWT Secret is missing.');
+  if (!clientId || !clientSecret || !redirectUri) {
+    throw new Error('Client ID, Client Secret, or Redirect URI is missing.');
   }
 
   try {
@@ -40,6 +39,11 @@ export const handleOAuthCallback = async (code, res) => {
     console.log('Access Token:', accessToken);
 
     // Generate JWT
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT Secret is missing.');
+    }
+
     const jwtToken = jwt.sign({ accessToken }, jwtSecret, { expiresIn: '1h' });
     console.log('JWT Token:', jwtToken);
 
