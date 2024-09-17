@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent, Typography, Grid, Avatar, Container, Box, CircularProgress, Chip } from '@mui/material';
-import { EventNote, LocationOn, Person } from '@mui/icons-material';
+import { Card, CardContent, Typography, Grid, Avatar, Container, Box, CircularProgress, Chip, Button } from '@mui/material';
+import { EventNote, LocationOn, Person, Notifications } from '@mui/icons-material';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dashboardDataRef = useRef(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     dashboardDataRef.current = dashboardData;
@@ -54,9 +55,9 @@ const Dashboard = () => {
       return;
     }
   
-    newData.tournaments.nodes.forEach((newTournament, tIndex) => {
-      newTournament.events.forEach((newEvent, eIndex) => {
-        const oldEvent = oldData.tournaments.nodes[tIndex]?.events[eIndex];
+    newData.tournaments.nodes.forEach((newTournament) => {
+      newTournament.events.forEach((newEvent) => {
+        const oldEvent = oldData.tournaments.nodes.find(t => t.id === newTournament.id)?.events.find(e => e.id === newEvent.id);
         if (!oldEvent) {
           console.log('No matching old event found');
           return;
@@ -79,45 +80,14 @@ const Dashboard = () => {
   
             console.log('Is player involved:', isPlayerInvolved);
             if (isPlayerInvolved) {
-              let notificationTitle, notificationBody;
-  
-              // Updated state change handling
-              switch (newSet.state) {
-                case '1':
-                  notificationTitle = 'Match Created';
-                  notificationBody = `A new match has been created for you at ${newTournament.name} (${newEvent.name}).`;
-                  break;
-                case '2':  // Match Started
-                  notificationTitle = 'Match Started';
-                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has begun. Station: ${newSet.station?.number || 'N/A'}`;
-                  break;
-                case '3':
-                  notificationTitle = 'Match Completed';
-                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been completed.`;
-                  break;
-                case '4':
-                  notificationTitle = 'Match Result Reported';
-                  notificationBody = `Results for your match at ${newTournament.name} (${newEvent.name}) have been reported.`;
-                  break;
-                case '5':  // Match Ready to Start
-                  notificationTitle = 'Match Ready to Start';
-                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) is ready to start. Please proceed to station ${newSet.station?.number || 'N/A'}.`;
-                  break;
-                case '6':  // Match Called
-                  notificationTitle = 'Match Called';
-                  notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been called. Please proceed to station: ${newSet.station?.number || 'N/A'}`;
-                  break;
-              }
+              const notificationTitle = 'Match Update';
+              const notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been updated. New state: ${newSet.state}`;
   
               console.log('Notification prepared:', { title: notificationTitle, body: notificationBody });
-              if (notificationTitle) {
-                sendNotification(notificationTitle, {
-                  body: notificationBody,
-                  icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
-                });
-              } else {
-                console.log('No notification title set');
-              }
+              sendNotification(notificationTitle, {
+                body: notificationBody,
+                icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+              });
             }
           }
         });
@@ -154,6 +124,14 @@ const Dashboard = () => {
       clearInterval(interval);
     };
   }, [fetchDashboardData]);
+
+  const requestNotificationPermission = () => {
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        setNotificationsEnabled(true);
+      }
+    });
+  };
 
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -230,18 +208,6 @@ const Dashboard = () => {
     );
   };
 
-  // Add this function to filter tournaments and events
-  const filterUserTournaments = (dashboardData) => {
-    if (!dashboardData || !dashboardData.tournaments) return [];
-
-    return dashboardData.tournaments.nodes.map(tournament => ({
-      ...tournament,
-      events: tournament.events.filter(event => 
-        event.entrants.nodes.some(entrant => entrant.name === dashboardData.player?.gamerTag)
-      )
-    })).filter(tournament => tournament.events.length > 0);
-  };
-
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
@@ -256,12 +222,21 @@ const Dashboard = () => {
               <Typography variant="h4" gutterBottom>
                 {dashboardData.player?.gamerTag || 'User'}
               </Typography>
+              <Button
+                variant="contained"
+                startIcon={<Notifications />}
+                onClick={requestNotificationPermission}
+                disabled={notificationsEnabled}
+                sx={{ mt: 2 }}
+              >
+                {notificationsEnabled ? 'Notifications Enabled' : 'Enable Notifications'}
+              </Button>
             </Box>
           </Grid>
           <Grid item xs={12} md={9}>
             <Typography variant="h4" gutterBottom>Your Tournaments</Typography>
-            {filterUserTournaments(dashboardData).length > 0 ? (
-              filterUserTournaments(dashboardData).flatMap((tournament) => 
+            {dashboardData.tournaments.nodes.length > 0 ? (
+              dashboardData.tournaments.nodes.flatMap((tournament) => 
                 tournament.events.map((event) => (
                   <TournamentEventCard 
                     key={`${tournament.id}-${event.id}`} 
