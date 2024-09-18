@@ -4,6 +4,8 @@ import { EventNote, LocationOn, Person, Notifications } from '@mui/icons-materia
 import axios from 'axios';
 
 const Dashboard = () => {
+  console.log('Dashboard component rendering');
+
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,22 +14,27 @@ const Dashboard = () => {
   const [lastPlayerSetsCount, setLastPlayerSetsCount] = useState(0);
 
   useEffect(() => {
+    console.log('dashboardData updated:', dashboardData);
     dashboardDataRef.current = dashboardData;
   }, [dashboardData]);
 
   const fetchDashboardData = useCallback(async () => {
+    console.log('Fetching dashboard data...');
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dashboard`, {
         withCredentials: true
       });
+      console.log('Dashboard data fetched successfully:', response.data);
       return response.data.data?.currentUser || null;
     } catch (err) {
+      console.error('Error fetching dashboard data:', err);
       setError('Failed to fetch dashboard data');
       return null;
     }
   }, []);
 
   const sendNotification = useCallback(async (title, options) => {
+    console.log('Attempting to send notification:', title, options);
     if (!('serviceWorker' in navigator)) {
       console.log('Service Workers are not supported in this browser');
       return;
@@ -36,12 +43,14 @@ const Dashboard = () => {
     try {
       const registration = await navigator.serviceWorker.ready;
       await registration.showNotification(title, options);
+      console.log('Notification sent successfully');
     } catch (error) {
       console.error('Error sending notification:', error);
     }
   }, []);
 
   const notifyNewSets = useCallback(async (newData) => {
+    console.log('Checking for new sets...');
     const newPlayerSets = newData.tournaments.nodes.flatMap(tournament =>
       tournament.events.flatMap(event =>
         event.sets.nodes.filter(set =>
@@ -50,112 +59,117 @@ const Dashboard = () => {
       )
     );
 
+    console.log('New player sets count:', newPlayerSets.length);
+    console.log('Last player sets count:', lastPlayerSetsCount);
+
     if (newPlayerSets.length > lastPlayerSetsCount) {
       const newSetsCount = newPlayerSets.length - lastPlayerSetsCount;
+      console.log(`${newSetsCount} new set(s) found. Sending notification.`);
       await sendNotification('New Sets Available', {
         body: `You have ${newSetsCount} new set${newSetsCount > 1 ? 's' : ''} to play.`,
         icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
         tag: 'new-sets',
         renotify: true
       });
+    } else {
+      console.log('No new sets found.');
     }
     setLastPlayerSetsCount(newPlayerSets.length);
   }, [sendNotification, lastPlayerSetsCount]);
 
   const checkForUpdates = useCallback(async (newData) => {
+    console.log('Checking for updates...');
     const oldData = dashboardDataRef.current;
-    if (!oldData || !newData) return;
+    if (!oldData || !newData) {
+      console.log('No old data or new data available for comparison');
+      return;
+    }
 
-    // 1. Compare Tournaments
-    const newTournamentIds = newData.tournaments.nodes.map(t => t.id);
-    const oldTournamentIds = oldData.tournaments.nodes.map(t => t.id);
+    newData.tournaments.nodes.forEach((newTournament) => {
+      const oldTournament = oldData.tournaments.nodes.find(t => t.id === newTournament.id);
+      if (!oldTournament) {
+        console.log(`New tournament found: ${newTournament.name}`);
+        return;
+      }
+      newTournament.events.forEach((newEvent) => {
+        const oldEvent = oldTournament.events.find(e => e.id === newEvent.id);
+        if (!oldEvent) {
+          console.log(`New event found in tournament ${newTournament.name}: ${newEvent.name}`);
+          return;
+        }
+        newEvent.sets.nodes.forEach(async (newSet) => {
+          const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
+          if (!oldSet || newSet.state === oldSet.state) return;
+          const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag);
+          if (isPlayerInvolved) {
+            console.log(`Set state changed for player ${newData.player?.gamerTag}:`, oldSet.state, '->', newSet.state);
+            let stateChange = '';
+            if (oldSet.state === '1' && newSet.state === '6') stateChange = 'Your match has been called!';
+            else if (oldSet.state === '6' && newSet.state === '2') stateChange = 'Your match is now in progress!';
+            else if (newSet.state === '3') stateChange = 'Your match has ended!';
+            else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
 
-    // Find new tournaments
-    const newTournaments = newData.tournaments.nodes.filter(t => !oldTournamentIds.includes(t.id));
-    // Find tournaments that have been updated
-    const updatedTournaments = newData.tournaments.nodes.filter(t => oldTournamentIds.includes(t.id) && !oldData.tournaments.nodes.find(ot => ot.id === t.id && JSON.stringify(ot) === JSON.stringify(t)));
-
-    // 2. Compare Events
-    newTournaments.forEach(newTournament => {
-      // Notify for new tournaments
-      sendNotification('New Tournament', {
-        body: `You've been added to a new tournament: ${newTournament.name}`,
-        icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
-        tag: `new-tournament-${newTournament.id}`,
-        renotify: true
-      });
-      newTournament.events.forEach(async (newEvent) => {
-        // Notify for new events
-        sendNotification('New Event', {
-          body: `You've been added to a new event: ${newEvent.name} in ${newTournament.name}`,
-          icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
-          tag: `new-event-${newEvent.id}`,
-          renotify: true
+            await sendNotification('Match Update', {
+              body: `${stateChange} - ${newTournament.name} (${newEvent.name})`,
+              icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+              tag: `match-update-${newSet.id}`,
+              renotify: true
+            });
+          }
         });
-        // Check for updates in existing events
-        const oldEvent = oldData.tournaments.nodes.find(t => t.id === newTournament.id)?.events.find(e => e.id === newEvent.id);
-        if (oldEvent) {
-          await checkForSetUpdates(newEvent, oldEvent, newData.player?.gamerTag);
-        }
-      });
-    });
-
-    // 3. Compare Sets for updated tournaments
-    updatedTournaments.forEach(updatedTournament => {
-      updatedTournament.events.forEach(async (updatedEvent) => {
-        const oldEvent = oldData.tournaments.nodes.find(t => t.id === updatedTournament.id)?.events.find(e => e.id === updatedEvent.id);
-        if (oldEvent) {
-          await checkForSetUpdates(updatedEvent, oldEvent, newData.player?.gamerTag);
-        }
       });
     });
 
     await notifyNewSets(newData);
   }, [sendNotification, notifyNewSets]);
 
-  const checkForSetUpdates = useCallback(async (newEvent, oldEvent, loggedInPlayerName) => {
-    newEvent.sets.nodes.forEach(async (newSet) => {
-      const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
-      if (!oldSet || newSet.state === oldSet.state) return;
-      const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === loggedInPlayerName);
-      if (isPlayerInvolved) {
-        let stateChange = '';
-        if (oldSet.state === '1' && newSet.state === '6') stateChange = 'Your match has been called!';
-        else if (oldSet.state === '6' && newSet.state === '2') stateChange = 'Your match is now in progress!';
-        else if (newSet.state === '3') stateChange = 'Your match has ended!';
-        else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
-
-        await sendNotification('Match Update', {
-          body: `${stateChange} - ${newEvent.name}`,
-          icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
-          tag: `match-update-${newSet.id}`,
-          renotify: true
-        });
-      }
-    });
-  }, [sendNotification]);
-
   useEffect(() => {
-    const initialFetch = async () => {
-      const data = await fetchDashboardData();
-      setDashboardData(data);
-      setLoading(false);
+    console.log('Dashboard component mounted');
+    let isMounted = true;
+    let intervalId = null;
+
+    const fetchData = async () => {
+      console.log('Fetching data...');
+      try {
+        const data = await fetchDashboardData();
+        if (isMounted) {
+          if (data) {
+            console.log('New data received, checking for updates');
+            await checkForUpdates(data);
+            setDashboardData(data);
+          } else {
+            console.log('No data received from fetchDashboardData');
+          }
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error in fetchData:', err);
+        if (isMounted) {
+          setError('Failed to fetch dashboard data');
+          setLoading(false);
+        }
+      }
     };
 
-    initialFetch();
+    fetchData(); // Initial fetch
 
-    const interval = setInterval(async () => {
-      const newData = await fetchDashboardData();
-      if (newData) {
-        await checkForUpdates(newData);
-        setDashboardData(newData);
-      }
+    intervalId = setInterval(() => {
+      console.log('Interval triggered, fetching data...');
+      fetchData();
     }, 10000); // Refresh every 10 seconds
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('Dashboard component unmounting');
+      isMounted = false;
+      if (intervalId) {
+        console.log('Clearing interval');
+        clearInterval(intervalId);
+      }
+    };
   }, [fetchDashboardData, checkForUpdates]);
 
   const requestNotificationPermission = async () => {
+    console.log('Requesting notification permission...');
     if (!('serviceWorker' in navigator)) {
       console.log('Service Workers are not supported in this browser');
       return;
@@ -163,6 +177,7 @@ const Dashboard = () => {
     
     try {
       const permission = await Notification.requestPermission();
+      console.log('Notification permission:', permission);
       if (permission === 'granted') {
         setNotificationsEnabled(true);
         const registration = await navigator.serviceWorker.ready;
@@ -170,18 +185,24 @@ const Dashboard = () => {
           body: 'You will now receive notifications for your matches.',
           icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
         });
+        console.log('Notification sent: Notifications Enabled');
       }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
     }
   };
 
+  console.log('Rendering Dashboard component');
+  console.log('Current state:', { loading, error, dashboardData, notificationsEnabled, lastPlayerSetsCount });
+
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!dashboardData) return <Typography>No dashboard data available</Typography>;
 
   const TournamentEventCard = ({ tournament, event, loggedInPlayerName }) => {
+    console.log(`Rendering TournamentEventCard for ${tournament.name} - ${event.name}`);
     const playerSets = event.sets.nodes.filter(set => set.slots.some(slot => slot.entrant?.name === loggedInPlayerName));
+    console.log(`Player sets for ${loggedInPlayerName}:`, playerSets);
 
     const getSetStateChip = (state) => {
       if (state === '6') return <Chip label="Called" size="small" sx={{ bgcolor: 'orange', color: 'white' }} />;
