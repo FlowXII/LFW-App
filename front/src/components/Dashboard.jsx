@@ -28,33 +28,49 @@ const Dashboard = () => {
   }, []);
 
   const sendNotification = useCallback((title, options) => {
-    if (!('Notification' in window)) return;
+    if (!('Notification' in window)) {
+      console.log('Notifications not supported in this browser');
+      return;
+    }
     if (Notification.permission === 'granted') {
       try {
-        new Notification(title, options);
+        const notification = new Notification(title, options);
+        notification.onclick = function() {
+          window.focus();
+          this.close();
+        };
       } catch (error) {
         console.error('Error sending notification:', error);
       }
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          sendNotification(title, options);
+        }
+      });
     }
   }, []);
 
-  const notifyPlayerToPlay = (newData) => {
-    const newPlayerSetsCount = newData.tournaments.nodes.flatMap(tournament =>
+  const notifyNewSets = useCallback((newData) => {
+    const newPlayerSets = newData.tournaments.nodes.flatMap(tournament =>
       tournament.events.flatMap(event =>
         event.sets.nodes.filter(set =>
           set.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag)
         )
       )
-    ).length;
+    );
 
-    if (newPlayerSetsCount > lastPlayerSetsCount) {
-      sendNotification('You have to play!', {
-        body: 'A new match is available for you to play.',
+    if (newPlayerSets.length > lastPlayerSetsCount) {
+      const newSetsCount = newPlayerSets.length - lastPlayerSetsCount;
+      sendNotification('New Sets Available', {
+        body: `You have ${newSetsCount} new set${newSetsCount > 1 ? 's' : ''} to play.`,
         icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+        tag: 'new-sets',
+        renotify: true
       });
     }
-    setLastPlayerSetsCount(newPlayerSetsCount);
-  };
+    setLastPlayerSetsCount(newPlayerSets.length);
+  }, [sendNotification, lastPlayerSetsCount]);
 
   const checkForUpdates = useCallback((newData) => {
     const oldData = dashboardDataRef.current;
@@ -66,24 +82,30 @@ const Dashboard = () => {
       newTournament.events.forEach((newEvent) => {
         const oldEvent = oldTournament.events.find(e => e.id === newEvent.id);
         if (!oldEvent) return;
-        newEvent.sets.nodes.forEach((newSet, sIndex) => {
-          const oldSet = oldEvent.sets.nodes[sIndex];
+        newEvent.sets.nodes.forEach((newSet) => {
+          const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
           if (!oldSet || newSet.state === oldSet.state) return;
           const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag);
           if (isPlayerInvolved) {
-            const notificationTitle = 'Match Update';
-            const notificationBody = `Your match at ${newTournament.name} (${newEvent.name}) has been updated. New state: ${newSet.state}`;
-            sendNotification(notificationTitle, {
-              body: notificationBody,
+            let stateChange = '';
+            if (oldSet.state === '1' && newSet.state === '6') stateChange = 'Your match has been called!';
+            else if (oldSet.state === '6' && newSet.state === '2') stateChange = 'Your match is now in progress!';
+            else if (newSet.state === '3') stateChange = 'Your match has ended!';
+            else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
+
+            sendNotification('Match Update', {
+              body: `${stateChange} - ${newTournament.name} (${newEvent.name})`,
               icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+              tag: `match-update-${newSet.id}`,
+              renotify: true
             });
           }
         });
       });
     });
 
-    notifyPlayerToPlay(newData);
-  }, [sendNotification, lastPlayerSetsCount]);
+    notifyNewSets(newData);
+  }, [sendNotification, notifyNewSets]);
 
   useEffect(() => {
     const initialFetch = async () => {
@@ -106,9 +128,18 @@ const Dashboard = () => {
   }, [fetchDashboardData, checkForUpdates]);
 
   const requestNotificationPermission = () => {
-    if (!('Notification' in window)) return;
+    if (!('Notification' in window)) {
+      console.log('Notifications not supported in this browser');
+      return;
+    }
     Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') setNotificationsEnabled(true);
+      if (permission === 'granted') {
+        setNotificationsEnabled(true);
+        sendNotification('Notifications Enabled', {
+          body: 'You will now receive notifications for your matches.',
+          icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
+        });
+      }
     });
   };
 
