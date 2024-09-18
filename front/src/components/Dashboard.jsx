@@ -112,7 +112,7 @@ const Dashboard = () => {
         await checkForUpdates(newData);
         setDashboardData(newData);
       }
-    }, 10000);
+    }, 10000); // Refresh every 10 seconds
 
     return () => clearInterval(interval);
   }, [fetchDashboardData, checkForUpdates]);
@@ -150,6 +150,7 @@ const Dashboard = () => {
       if (state === '2') return <Chip label="Ongoing" size="small" sx={{ bgcolor: '#1976d2', color: 'white' }} />;
       return <Chip label={state} size="small" color="default" />;
     };
+
 
     return (
       <Card sx={{ mb: 2, boxShadow: 3, width: '100%', bgcolor: '#1e1e1e', color: 'white' }}>
