@@ -35,17 +35,34 @@ const Dashboard = () => {
 
   const sendNotification = useCallback(async (title, options) => {
     console.log('Attempting to send notification:', title, options);
+    
     if (!('serviceWorker' in navigator)) {
       console.log('Service Workers are not supported in this browser');
       return;
     }
-
+  
     try {
+      console.log('Checking if service worker is ready...');
       const registration = await navigator.serviceWorker.ready;
+      console.log('Service worker is ready:', registration);
+  
+      console.log('Checking notification permission...');
+      const permission = await Notification.requestPermission();
+      console.log('Notification permission:', permission);
+  
+      if (permission !== 'granted') {
+        console.log('Notification permission not granted');
+        return;
+      }
+  
+      console.log('Showing notification...');
       await registration.showNotification(title, options);
       console.log('Notification sent successfully');
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error('Error in sendNotification:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
     }
   }, []);
 
