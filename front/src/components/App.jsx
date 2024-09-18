@@ -28,7 +28,7 @@ function App() {
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
-      {/* <ServiceWorkerRegistration />*/}
+      <ServiceWorkerRegistration />
       <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
         <AuthProvider>
           <Router>
