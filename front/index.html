@@ -5,7 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LFW</title>
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
   </head>
   <body>
     <div id="root"></div>
@@ -13,7 +12,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register(`${process.env.PUBLIC_URL}/service-worker.js`)
+          navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             })
