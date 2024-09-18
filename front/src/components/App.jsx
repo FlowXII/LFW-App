@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { CssBaseline, ThemeProvider} from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { darkTheme, lightTheme } from './common/theme.jsx';
 import { Box } from '@mui/system';
 import HomePage from './HomePage';
@@ -13,26 +13,13 @@ import Login from './Login';
 import Profile from './Profile';
 import { AuthProvider } from './AuthContext.jsx';
 import withAuth from './withAuth.jsx';
+import ServiceWorkerRegistration from './ServiceWorkerRegistration';
 
 // Create an authenticated version of the Dashboard component
 const AuthenticatedDashboard = withAuth(Dashboard);
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
-
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          })
-          .catch((error) => {
-            console.log('ServiceWorker registration failed: ', error);
-          });
-      });
-    }
-  }, []);
 
   const handleThemeChange = () => {
     setDarkMode(!darkMode);
@@ -41,6 +28,7 @@ function App() {
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
+      <ServiceWorkerRegistration />
       <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
         <AuthProvider>
           <Router>
