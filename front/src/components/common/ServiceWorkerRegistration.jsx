@@ -6,35 +6,33 @@ const ServiceWorkerRegistration = () => {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swUrl = `https://lfw-app.vercel.app/service-worker.js`;
-        navigator.serviceWorker
-          .register(swUrl)
-          .then((registration) => {
-            console.log('ServiceWorker registered: ', registration);
+      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+      navigator.serviceWorker
+        .register(swUrl)
+        .then((registration) => {
+          console.log('ServiceWorker registered: ', registration);
 
-            registration.onupdatefound = () => {
-              const installingWorker = registration.installing;
-              if (installingWorker == null) {
-                return;
-              }
-              installingWorker.onstatechange = () => {
-                if (installingWorker.state === 'installed') {
-                  if (navigator.serviceWorker.controller) {
-                    console.log('New content is available; please refresh.');
-                    setWaitingWorker(registration.waiting);
-                    setNewVersionAvailable(true);
-                  } else {
-                    console.log('Content is cached for offline use.');
-                  }
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            if (installingWorker == null) {
+              return;
+            }
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  console.log('New content is available; please refresh.');
+                  setWaitingWorker(registration.waiting);
+                  setNewVersionAvailable(true);
+                } else {
+                  console.log('Content is cached for offline use.');
                 }
-              };
+              }
             };
-          })
-          .catch((error) => {
-            console.error('Error registering service worker: ', error);
-          });
-      });
+          };
+        })
+        .catch((error) => {
+          console.error('Error registering service worker: ', error);
+        });
     }
   }, []);
 
