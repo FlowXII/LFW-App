@@ -13,7 +13,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register(`${process.env.PUBLIC_URL}/service-worker.js`)
+          navigator.serviceWorker.register(`lfw-app.vercel.app/service-worker.js`)
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             })
