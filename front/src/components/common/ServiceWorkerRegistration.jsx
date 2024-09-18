@@ -44,7 +44,7 @@ const ServiceWorkerRegistration = () => {
     }
   };
 
-  if (newVersionAvailable) {
+/* if (newVersionAvailable) {
     return (
       <div>
         New version available! 
@@ -52,8 +52,8 @@ const ServiceWorkerRegistration = () => {
       </div>
     );
   }
-
-  return null;
+*/
+  return null; 
 };
 
 export default ServiceWorkerRegistration;
