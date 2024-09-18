@@ -11,6 +11,13 @@ const urlsToCache = [
   // Add other static assets you want to cache
 ];
 
+// Routes to ignore
+const ignoredRoutes = [
+  '/oauth_redirect',
+  '/login',
+  // Add any other routes that shouldn't be intercepted
+];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -18,7 +25,18 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Remove the fetch event listener completely
+self.addEventListener('fetch', (event) => {
+  // Check if the request URL includes any of the ignored routes
+  if (ignoredRoutes.some(route => event.request.url.includes(route))) {
+    return; // Do nothing, let the browser handle the request normally
+  }
+
+  // For other routes, use the cache-first strategy
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => response || fetch(event.request))
+  );
+});
 
 self.addEventListener('push', (event) => {
   const data = event.data.json();
