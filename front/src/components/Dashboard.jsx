@@ -66,36 +66,74 @@ const Dashboard = () => {
     const oldData = dashboardDataRef.current;
     if (!oldData || !newData) return;
 
-    newData.tournaments.nodes.forEach((newTournament) => {
-      const oldTournament = oldData.tournaments.nodes.find(t => t.id === newTournament.id);
-      if (!oldTournament) return;
-      newTournament.events.forEach((newEvent) => {
-        const oldEvent = oldTournament.events.find(e => e.id === newEvent.id);
-        if (!oldEvent) return;
-        newEvent.sets.nodes.forEach(async (newSet) => {
-          const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
-          if (!oldSet || newSet.state === oldSet.state) return;
-          const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag);
-          if (isPlayerInvolved) {
-            let stateChange = '';
-            if (oldSet.state === '1' && newSet.state === '6') stateChange = 'Your match has been called!';
-            else if (oldSet.state === '6' && newSet.state === '2') stateChange = 'Your match is now in progress!';
-            else if (newSet.state === '3') stateChange = 'Your match has ended!';
-            else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
+    // 1. Compare Tournaments
+    const newTournamentIds = newData.tournaments.nodes.map(t => t.id);
+    const oldTournamentIds = oldData.tournaments.nodes.map(t => t.id);
 
-            await sendNotification('Match Update', {
-              body: `${stateChange} - ${newTournament.name} (${newEvent.name})`,
-              icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
-              tag: `match-update-${newSet.id}`,
-              renotify: true
-            });
-          }
+    // Find new tournaments
+    const newTournaments = newData.tournaments.nodes.filter(t => !oldTournamentIds.includes(t.id));
+    // Find tournaments that have been updated
+    const updatedTournaments = newData.tournaments.nodes.filter(t => oldTournamentIds.includes(t.id) && !oldData.tournaments.nodes.find(ot => ot.id === t.id && JSON.stringify(ot) === JSON.stringify(t)));
+
+    // 2. Compare Events
+    newTournaments.forEach(newTournament => {
+      // Notify for new tournaments
+      sendNotification('New Tournament', {
+        body: `You've been added to a new tournament: ${newTournament.name}`,
+        icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+        tag: `new-tournament-${newTournament.id}`,
+        renotify: true
+      });
+      newTournament.events.forEach(async (newEvent) => {
+        // Notify for new events
+        sendNotification('New Event', {
+          body: `You've been added to a new event: ${newEvent.name} in ${newTournament.name}`,
+          icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
+          tag: `new-event-${newEvent.id}`,
+          renotify: true
         });
+        // Check for updates in existing events
+        const oldEvent = oldData.tournaments.nodes.find(t => t.id === newTournament.id)?.events.find(e => e.id === newEvent.id);
+        if (oldEvent) {
+          await checkForSetUpdates(newEvent, oldEvent, newData.player?.gamerTag);
+        }
+      });
+    });
+
+    // 3. Compare Sets for updated tournaments
+    updatedTournaments.forEach(updatedTournament => {
+      updatedTournament.events.forEach(async (updatedEvent) => {
+        const oldEvent = oldData.tournaments.nodes.find(t => t.id === updatedTournament.id)?.events.find(e => e.id === updatedEvent.id);
+        if (oldEvent) {
+          await checkForSetUpdates(updatedEvent, oldEvent, newData.player?.gamerTag);
+        }
       });
     });
 
     await notifyNewSets(newData);
   }, [sendNotification, notifyNewSets]);
+
+  const checkForSetUpdates = useCallback(async (newEvent, oldEvent, loggedInPlayerName) => {
+    newEvent.sets.nodes.forEach(async (newSet) => {
+      const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
+      if (!oldSet || newSet.state === oldSet.state) return;
+      const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === loggedInPlayerName);
+      if (isPlayerInvolved) {
+        let stateChange = '';
+        if (oldSet.state === '1' && newSet.state === '6') stateChange = 'Your match has been called!';
+        else if (oldSet.state === '6' && newSet.state === '2') stateChange = 'Your match is now in progress!';
+        else if (newSet.state === '3') stateChange = 'Your match has ended!';
+        else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
+
+        await sendNotification('Match Update', {
+          body: `${stateChange} - ${newEvent.name}`,
+          icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
+          tag: `match-update-${newSet.id}`,
+          renotify: true
+        });
+      }
+    });
+  }, [sendNotification]);
 
   useEffect(() => {
     const initialFetch = async () => {
