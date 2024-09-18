@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CssBaseline, ThemeProvider} from '@mui/material';
 import { darkTheme, lightTheme } from './common/theme.jsx';
@@ -19,6 +19,20 @@ const AuthenticatedDashboard = withAuth(Dashboard);
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch((error) => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  }, []);
 
   const handleThemeChange = () => {
     setDarkMode(!darkMode);

@@ -27,27 +27,34 @@ const Dashboard = () => {
     }
   }, []);
 
-  const sendNotification = useCallback((title, options) => {
+  const sendNotification = useCallback(async (title, options) => {
     if (!('Notification' in window)) {
       console.log('Notifications not supported in this browser');
       return;
     }
+
+    const showNotification = async () => {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // We're in a service worker context
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(title, options);
+      } else {
+        // We're in a regular web context
+        new Notification(title, options);
+      }
+    };
+
     if (Notification.permission === 'granted') {
       try {
-        const notification = new Notification(title, options);
-        notification.onclick = function() {
-          window.focus();
-          this.close();
-        };
+        await showNotification();
       } catch (error) {
         console.error('Error sending notification:', error);
       }
     } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          sendNotification(title, options);
-        }
-      });
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        await showNotification();
+      }
     }
   }, []);
 
@@ -127,20 +134,24 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [fetchDashboardData, checkForUpdates]);
 
-  const requestNotificationPermission = () => {
+  const requestNotificationPermission = async () => {
     if (!('Notification' in window)) {
       console.log('Notifications not supported in this browser');
       return;
     }
-    Notification.requestPermission().then((permission) => {
+    
+    try {
+      const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
-        sendNotification('Notifications Enabled', {
+        await sendNotification('Notifications Enabled', {
           body: 'You will now receive notifications for your matches.',
           icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
         });
       }
-    });
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+    }
   };
 
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
