@@ -6,7 +6,7 @@ const urlsToCache = [
   '/static/js/0.chunk.js',
   '/static/js/bundle.js',
   '/static/css/main.chunk.css',
-  // Add other assets you want to cache
+  // Add other static assets you want to cache
 ];
 
 self.addEventListener('install', (event) => {
@@ -17,39 +17,19 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Check if the request is for the login route
-  if (event.request.url.includes('/login')) {
-    // For login requests, always go to the network
-    return event.respondWith(fetch(event.request));
+  // Only intercept GET requests for cached static assets
+  if (event.request.method !== 'GET') {
+    return;
   }
 
-  // For other requests, try the cache first, then the network
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(
-          (response) => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response as it's a stream and can only be consumed once
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        );
-      })
-  );
+  const url = new URL(event.request.url);
+  if (urlsToCache.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => response || fetch(event.request))
+    );
+  }
+  // For all other requests, proceed to the network without interception
 });
 
 self.addEventListener('push', (event) => {
