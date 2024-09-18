@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { darkTheme, lightTheme } from './common/theme.jsx';
 import { Box } from '@mui/system';
-import HomePage from './HomePage';
+import { AuthProvider } from './AuthContext.jsx';
+import { darkTheme, lightTheme } from './common/theme.jsx';
+import withAuth from './withAuth.jsx';
+import ServiceWorkerRegistration from './common/ServiceWorkerRegistration.jsx';
+
+// Components
 import Sidebar from "./Sidebar";
+import HomePage from './HomePage';
 import Dashboard from "./Dashboard";
 import NextBattle from "./TournamentsUpcoming.jsx";
 import TOloader from "./TournamentsStations.jsx";
 import PlayerLookUp from './TournamentsUser.jsx';
 import Login from './Login';
 import Profile from './Profile';
-import { AuthProvider } from './AuthContext.jsx';
-import withAuth from './withAuth.jsx';
-import ServiceWorkerRegistration from './common/ServiceWorkerRegistration.jsx';
 
 // Create an authenticated version of the Dashboard component
 const AuthenticatedDashboard = withAuth(Dashboard);
@@ -26,12 +28,12 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      <ServiceWorkerRegistration />
-      <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
-        <AuthProvider>
-          <Router>
+    <AuthProvider>
+      <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+        <CssBaseline />
+        <ServiceWorkerRegistration />
+        <Router>
+          <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
             <Sidebar isDark={darkMode} handleThemeChange={handleThemeChange} />
             <Box
               component="main"
@@ -53,10 +55,10 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
               </Routes>
             </Box>
-          </Router>
-        </AuthProvider>
-      </Box>
-    </ThemeProvider>
+          </Box>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
