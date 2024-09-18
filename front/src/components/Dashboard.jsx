@@ -28,37 +28,20 @@ const Dashboard = () => {
   }, []);
 
   const sendNotification = useCallback(async (title, options) => {
-    if (!('Notification' in window)) {
-      console.log('Notifications not supported in this browser');
+    if (!('serviceWorker' in navigator)) {
+      console.log('Service Workers are not supported in this browser');
       return;
     }
 
-    const showNotification = async () => {
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        // We're in a service worker context
-        const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification(title, options);
-      } else {
-        // We're in a regular web context
-        new Notification(title, options);
-      }
-    };
-
-    if (Notification.permission === 'granted') {
-      try {
-        await showNotification();
-      } catch (error) {
-        console.error('Error sending notification:', error);
-      }
-    } else if (Notification.permission !== 'denied') {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        await showNotification();
-      }
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, options);
+    } catch (error) {
+      console.error('Error sending notification:', error);
     }
   }, []);
 
-  const notifyNewSets = useCallback((newData) => {
+  const notifyNewSets = useCallback(async (newData) => {
     const newPlayerSets = newData.tournaments.nodes.flatMap(tournament =>
       tournament.events.flatMap(event =>
         event.sets.nodes.filter(set =>
@@ -69,7 +52,7 @@ const Dashboard = () => {
 
     if (newPlayerSets.length > lastPlayerSetsCount) {
       const newSetsCount = newPlayerSets.length - lastPlayerSetsCount;
-      sendNotification('New Sets Available', {
+      await sendNotification('New Sets Available', {
         body: `You have ${newSetsCount} new set${newSetsCount > 1 ? 's' : ''} to play.`,
         icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
         tag: 'new-sets',
@@ -79,7 +62,7 @@ const Dashboard = () => {
     setLastPlayerSetsCount(newPlayerSets.length);
   }, [sendNotification, lastPlayerSetsCount]);
 
-  const checkForUpdates = useCallback((newData) => {
+  const checkForUpdates = useCallback(async (newData) => {
     const oldData = dashboardDataRef.current;
     if (!oldData || !newData) return;
 
@@ -89,7 +72,7 @@ const Dashboard = () => {
       newTournament.events.forEach((newEvent) => {
         const oldEvent = oldTournament.events.find(e => e.id === newEvent.id);
         if (!oldEvent) return;
-        newEvent.sets.nodes.forEach((newSet) => {
+        newEvent.sets.nodes.forEach(async (newSet) => {
           const oldSet = oldEvent.sets.nodes.find(s => s.id === newSet.id);
           if (!oldSet || newSet.state === oldSet.state) return;
           const isPlayerInvolved = newSet.slots.some(slot => slot.entrant?.name === newData.player?.gamerTag);
@@ -100,7 +83,7 @@ const Dashboard = () => {
             else if (newSet.state === '3') stateChange = 'Your match has ended!';
             else stateChange = `Your match state changed from ${oldSet.state} to ${newSet.state}`;
 
-            sendNotification('Match Update', {
+            await sendNotification('Match Update', {
               body: `${stateChange} - ${newTournament.name} (${newEvent.name})`,
               icon: newData.images?.[1]?.url || '/path/to/default-icon.png',
               tag: `match-update-${newSet.id}`,
@@ -111,7 +94,7 @@ const Dashboard = () => {
       });
     });
 
-    notifyNewSets(newData);
+    await notifyNewSets(newData);
   }, [sendNotification, notifyNewSets]);
 
   useEffect(() => {
@@ -126,7 +109,7 @@ const Dashboard = () => {
     const interval = setInterval(async () => {
       const newData = await fetchDashboardData();
       if (newData) {
-        checkForUpdates(newData);
+        await checkForUpdates(newData);
         setDashboardData(newData);
       }
     }, 10000);
@@ -135,8 +118,8 @@ const Dashboard = () => {
   }, [fetchDashboardData, checkForUpdates]);
 
   const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      console.log('Notifications not supported in this browser');
+    if (!('serviceWorker' in navigator)) {
+      console.log('Service Workers are not supported in this browser');
       return;
     }
     
@@ -144,7 +127,8 @@ const Dashboard = () => {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
-        await sendNotification('Notifications Enabled', {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification('Notifications Enabled', {
           body: 'You will now receive notifications for your matches.',
           icon: dashboardData.images?.[1]?.url || '/path/to/default-icon.png',
         });
