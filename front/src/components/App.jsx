@@ -13,7 +13,7 @@ import Login from './Login';
 import Profile from './Profile';
 import { AuthProvider } from './AuthContext.jsx';
 import withAuth from './withAuth.jsx';
-import ServiceWorkerRegistration from './ServiceWorkerRegistration';
+import ServiceWorkerRegistration from './common/ServiceWorkerRegistration.jsx';
 
 // Create an authenticated version of the Dashboard component
 const AuthenticatedDashboard = withAuth(Dashboard);
