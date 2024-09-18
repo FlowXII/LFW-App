@@ -1,12 +1,19 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), 
+  plugins: [
+    react(),
     VitePWA({
-    injectRegister: 'auto'
-  })
-],
-})
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'My React App',
+        short_name: 'ReactApp',
+        description: 'My React App description',
+        theme_color: '#ffffff'
+        // Icons can be omitted if not needed
+      }
+    })
+  ]
+});
