@@ -6,7 +6,7 @@ const ServiceWorkerRegistration = () => {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      const swUrl = `lfw-app.vercel.app/service-worker.js`;
+      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
       navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
