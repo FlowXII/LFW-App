@@ -1,3 +1,5 @@
+// service-worker.js
+
 const CACHE_NAME = 'tournament-app-cache-v1';
 const urlsToCache = [
   '/',
@@ -16,21 +18,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  // Only intercept GET requests for cached static assets
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  const url = new URL(event.request.url);
-  if (urlsToCache.includes(url.pathname)) {
-    event.respondWith(
-      caches.match(event.request)
-        .then((response) => response || fetch(event.request))
-    );
-  }
-  // For all other requests, proceed to the network without interception
-});
+// Remove the fetch event listener completely
 
 self.addEventListener('push', (event) => {
   const data = event.data.json();
